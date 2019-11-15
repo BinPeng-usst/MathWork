@@ -46,6 +46,7 @@ TS1=dtrend(TS1(1:Num)-polyval(polyfit(t,TS1(1:Num),DtrdOdr),t));
 TS4=dtrend(TS4(1:Num)-polyval(polyfit(t,TS4(1:Num),DtrdOdr),t));
 TS7=dtrend(TS7(1:Num)-polyval(polyfit(t,TS7(1:Num),DtrdOdr),t));
 
+
 %% SVD decompositon
 NS=[TS1,TS4,TS7];
 [U,e,V] = svd(NS,0);
