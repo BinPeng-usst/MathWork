@@ -54,8 +54,9 @@ NS=U(:,1)*e(1,1)*V(1,:);
 NS=(NS(:,1)+NS(:,2)+NS(:,3))/3;
 
 %% EKF construction
-Omiga=14.55*(2*pi);Amp=mean(abs(TS7));Phase=0;% priors
-StateTranF=@(T) (T+sign(T)*sign((1-(T/Amp)^2))*(Amp*Omiga*sqrt(sign((1-(T/Amp)^2))*(1-(T/Amp)^2)))*(1/SamFreq));
+% Omiga=14.55*(2*pi);Amp=mean(abs(TS7));Phase=0;% priors
+% StateTranF=@(T) (T+sign(T)*sign((1-(T/Amp)^2))*(Amp*Omiga*sqrt(sign((1-(T/Amp)^2))*(1-(T/Amp)^2)))*(1/SamFreq));
+StateTranF=@(X,U) expm(Phi*DeltaT)*X+  -1*Phi^(-1)*expm(Phi*()B*U
 MeasurementF=@(Y) Y;
 obj = extendedKalmanFilter(StateTranF,MeasurementF,[NS(1)],'StateCovariance',5);
 obj.ProcessNoise=0.618;
