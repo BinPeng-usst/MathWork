@@ -1,11 +1,6 @@
 clear all;clc;close all;
-
-%% data preparation，S is the original signal，TS is the truncated&detrended signal, NS is SVD-processed signal, FS is EKF filtered signal
+%%Preparation of the ambinet test data.S is the original signal,TS is the truncated&detrended signal,NS is SVD-processed signal,FS is EKF filtered signal
 SamFreq=200;Rsl=4e-3;% Ambient test parameters
-% t=[0:1/SamFreq:1]';
-% S=Amp*sin(Omiga*t+Phase);
-% NS=awgn(S,0.01,'measured','linear');%snr=10*log10(Ps/Pn);
-% [S, NS]= wnoise('heavy sine',10,0.1);
 ImDataFile1='C:\Users\Bin Peng\OneDrive\振动与冲击（赵雅鑫）\资料\动测原始数据\W2\W2（1-1）\AI1-1_20141023172144190.mat'
 ImDataFile4='C:\Users\Bin Peng\OneDrive\振动与冲击（赵雅鑫）\资料\动测原始数据\W2\W2（1-1）\AI1-4_20141023172144190.mat'
 ImDataFile7='C:\Users\Bin Peng\OneDrive\振动与冲击（赵雅鑫）\资料\动测原始数据\W2\W2（1-1）\AI1-7_20141023172144190.mat'
@@ -45,23 +40,43 @@ t=[0:1/SamFreq:(Num-1)/SamFreq]';
 TS1=dtrend(TS1(1:Num)-polyval(polyfit(t,TS1(1:Num),DtrdOdr),t));
 TS4=dtrend(TS4(1:Num)-polyval(polyfit(t,TS4(1:Num),DtrdOdr),t));
 TS7=dtrend(TS7(1:Num)-polyval(polyfit(t,TS7(1:Num),DtrdOdr),t));
-
-
-%% SVD decompositon
+% SVD decompositon
 NS=[TS1,TS4,TS7];
 [U,e,V] = svd(NS,0);
 NS=U(:,1)*e(1,1)*V(1,:);
 NS=(NS(:,1)+NS(:,2)+NS(:,3))/3;
 
+%% Preparation of structural matricies
+ImMassFile='C:\Users\Bin Peng\OneDrive\振动与冲击（赵雅鑫）\资料\动测原始数据\W2\W2（1-1）\AI1-1_20141023172144190.mat'
+ImDampFile='C:\Users\Bin Peng\OneDrive\振动与冲击（赵雅鑫）\资料\动测原始数据\W2\W2（1-1）\AI1-4_20141023172144190.mat'
+ImStiffnessFile='C:\Users\Bin Peng\OneDrive\振动与冲击（赵雅鑫）\资料\动测原始数据\W2\W2（1-1）\AI1-7_20141023172144190.mat'
+ImOutputMFile='C:\Users\Bin Peng\OneDrive\振动与冲击（赵雅鑫）\资料\动测原始数据\W2\W2（1-1）\AI1-7_20141023172144190.mat'
+importdata(ImMassFile);
+M=ans.Data; 
+importdata(ImDampFile);
+K=ans.Data;
+importdata(ImStiffnessFile);
+C=ans.Data; 
+importdata(ImOutputMFile);
+D=ans.Data; 
+
 %% EKF construction
 % Omiga=14.55*(2*pi);Amp=mean(abs(TS7));Phase=0;% priors
 % StateTranF=@(T) (T+sign(T)*sign((1-(T/Amp)^2))*(Amp*Omiga*sqrt(sign((1-(T/Amp)^2))*(1-(T/Amp)^2)))*(1/SamFreq));
-StateTranF=@(X,U) expm(Phi*DeltaT)*X+  -1*Phi^(-1)*expm(Phi*()B*U
-MeasurementF=@(Y) Y;
+DeltaT=1/SamFreq;
+
+Phi=[0,1;(-1)*(M^-1)*K,(-1)*(M^-1)*C];
+Psi=[1;(-1)*M];
+
+A=expm(Phi*DeltaT);
+B=(Phi^-1)*(1-(expm(Phi*DeltaT))^-1)*Psi;
+
+StateTranF=@(X,U) A*X+B*U
+MeasurementF=@(Y) D*Y;
 obj = extendedKalmanFilter(StateTranF,MeasurementF,[NS(1)],'StateCovariance',5);
 obj.ProcessNoise=0.618;
 obj.MeasurementNoise=1; 
-% obj = unscentedKalmanFilter(StateTranF,MeasurementF,[1.0*sin(0.1)],'ProcessNoise',1,'MeasurementNoise',1);
+
 for k = 1:size(NS)
   [CorrectedState,CorrectedStateCovariance] = correct(obj,NS(k)); 
   [PredictedState,PredictedStateCovariance] = predict(obj);
