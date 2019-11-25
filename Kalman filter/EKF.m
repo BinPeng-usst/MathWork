@@ -1,64 +1,42 @@
 clear all;clc;close all;
-%%Preparation of the ambinet test data.S is the original signal,TS is the truncated&detrended signal,NS is SVD-processed signal,FS is EKF filtered signal
-SamFreq=200;Rsl=4e-3;% Ambient test parameters
-ImDataFile1='C:\Users\Bin Peng\OneDrive\振动与冲击（赵雅鑫）\资料\动测原始数据\W2\W2（1-1）\AI1-1_20141023172144190.mat'
-ImDataFile4='C:\Users\Bin Peng\OneDrive\振动与冲击（赵雅鑫）\资料\动测原始数据\W2\W2（1-1）\AI1-4_20141023172144190.mat'
-ImDataFile7='C:\Users\Bin Peng\OneDrive\振动与冲击（赵雅鑫）\资料\动测原始数据\W2\W2（1-1）\AI1-7_20141023172144190.mat'
-importdata(ImDataFile1);
-S1=ans.Data;
-importdata(ImDataFile4);
-S4=ans.Data;
-importdata(ImDataFile7);
-S7=ans.Data;
-%delete small voltage turbulents
-j=1;
-for i=1:size(S1)
-    if abs(S1(i))>Rsl
-        TS1(j,1)=S1(i);
-        j=j+1;
-    end
-end
-j=1;
-for i=1:size(S4)
-    if abs(S4(i))>Rsl
-        TS4(j,1)=S4(i);
-        j=j+1;
-    end
-end
-j=1;
-for i=1:size(S7)
-    if abs(S7(i))>Rsl
-        TS7(j,1)=S7(i);
-        j=j+1;
-    end
-end
-Num=min([size(TS1,1);size(TS4,1);size(TS7,1)]);
+%%Preparation of the ambinet test data.S is the original signal,TS is the detrended&truncated signal,NS is SVD-processed signal,FS is EKF filtered signal
+SamFreq=200;Rsl=1e-3;% Ambient test parameters
+ImDataFile1='C:\Users\Bin Peng\OneDrive - usst.edu.cn\桌面\Publication\振动与冲击（赵文昊）\data.mat'
+DRepos=importdata(ImDataFile1);
+IO=[DRepos.input,DRepos.output1,DRepos.output2,DRepos.output3,DRepos.output4,DRepos.output5,DRepos.output6,DRepos.output7]
 
 %detrend
 DtrdOdr=2;
-t=[0:1/SamFreq:(Num-1)/SamFreq]';
-TS1=dtrend(TS1(1:Num)-polyval(polyfit(t,TS1(1:Num),DtrdOdr),t));
-TS4=dtrend(TS4(1:Num)-polyval(polyfit(t,TS4(1:Num),DtrdOdr),t));
-TS7=dtrend(TS7(1:Num)-polyval(polyfit(t,TS7(1:Num),DtrdOdr),t));
-% SVD decompositon
-NS=[TS1,TS4,TS7];
+t=[0:1/SamFreq:(size(IO,1)-1)/SamFreq]';
+for i=1:size(IO,2)
+    IO(:,i)=dtrend(IO(:,i)-polyval(polyfit(t,IO(:,i),DtrdOdr),t));
+end
+
+%delete small voltage turbulents
+for i=1:size(IO,2)
+    for j=1:size(IO(:,i))
+      if abs(IO(j,i))>Rsl
+        TIO(j,i)=IO(j,i);
+        j=j+1;
+       else
+         TIO(j,i)=0;
+         j=j+1;
+        end
+    end
+end
+
+% SVD decompositon the output records
+for j=2:7;
+  NS(:,j-1)=TIO(:,j);
+end
 [U,e,V] = svd(NS,0);
 NS=U(:,1)*e(1,1)*V(1,:);
-NS=(NS(:,1)+NS(:,2)+NS(:,3))/3;
 
 %% Preparation of structural matricies
-ImMassFile='C:\Users\Bin Peng\OneDrive\振动与冲击（赵雅鑫）\资料\动测原始数据\W2\W2（1-1）\AI1-1_20141023172144190.mat'
-ImDampFile='C:\Users\Bin Peng\OneDrive\振动与冲击（赵雅鑫）\资料\动测原始数据\W2\W2（1-1）\AI1-4_20141023172144190.mat'
-ImStiffnessFile='C:\Users\Bin Peng\OneDrive\振动与冲击（赵雅鑫）\资料\动测原始数据\W2\W2（1-1）\AI1-7_20141023172144190.mat'
-ImOutputMFile='C:\Users\Bin Peng\OneDrive\振动与冲击（赵雅鑫）\资料\动测原始数据\W2\W2（1-1）\AI1-7_20141023172144190.mat'
-importdata(ImMassFile);
-M=ans.Data; 
-importdata(ImDampFile);
-K=ans.Data;
-importdata(ImStiffnessFile);
-C=ans.Data; 
-importdata(ImOutputMFile);
-D=ans.Data; 
+M=DRepos.M; 
+C=DRepos.C;
+K=DRepos.K; 
+% D=DRepos.; 
 
 %% EKF construction
 % Omiga=14.55*(2*pi);Amp=mean(abs(TS7));Phase=0;% priors
