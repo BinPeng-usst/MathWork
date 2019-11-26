@@ -36,15 +36,15 @@ NS=U(:,1)*e(1,1)*V(1,:);
 M=DRepos.M; 
 C=DRepos.C;
 K=DRepos.K; 
-% D=DRepos.; 
+D=DRepos.juzhen; 
 
 %% EKF construction
 % Omiga=14.55*(2*pi);Amp=mean(abs(TS7));Phase=0;% priors
 % StateTranF=@(T) (T+sign(T)*sign((1-(T/Amp)^2))*(Amp*Omiga*sqrt(sign((1-(T/Amp)^2))*(1-(T/Amp)^2)))*(1/SamFreq));
 DeltaT=1/SamFreq;
 
-Phi=[0,1;(-1)*(M^-1)*K,(-1)*(M^-1)*C];
-Psi=[1;(-1)*M];
+Phi=[zeros(150,150),ones(150,150);(-1)*(M^-1)*K,(-1)*(M^-1)*C];
+Psi=[ones(150,150);(-1)*M];
 
 A=expm(Phi*DeltaT);
 B=(Phi^-1)*(1-(expm(Phi*DeltaT))^-1)*Psi;
