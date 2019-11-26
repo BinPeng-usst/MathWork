@@ -43,8 +43,8 @@ D=DRepos.juzhen;
 % StateTranF=@(T) (T+sign(T)*sign((1-(T/Amp)^2))*(Amp*Omiga*sqrt(sign((1-(T/Amp)^2))*(1-(T/Amp)^2)))*(1/SamFreq));
 DeltaT=1/SamFreq;
 
-Phi=[zeros(150,150),ones(150,150);(-1)*(M^-1)*K,(-1)*(M^-1)*C];
-Psi=[ones(150,150);(-1)*M];
+Phi=[zeros(sizeof(M),sizeof(M)),ones(sizeof(M),sizeof(M));(-1)*(M^-1)*K,(-1)*(M^-1)*C];
+Psi=[ones(sizeof(M),sizeof(M));(-1)*M];
 
 A=expm(Phi*DeltaT);
 B=(Phi^-1)*(1-(expm(Phi*DeltaT))^-1)*Psi;
