@@ -49,15 +49,15 @@ Psi=[zeros(sizeof(M),sizeof(M));(-1)*M];
 A=expm(Phi*DeltaT);
 B=(Phi^-1)*(1-(expm(Phi*DeltaT))^-1)*Psi;
 
-StateTranF=@(X,U) A*X+B*U
-MeasurementF=@(Y) D*Y;
-obj = extendedKalmanFilter(StateTranF,MeasurementF,[NS(1)],'StateCovariance',5);
+StateFcn=@(X,U) A*X+B*U
+MeasurementFcn=@(Y) D*Y;
+obj = extendedKalmanFilter(StateFcn,MeasurementFcn,[NS(1)],'StateCovariance',5);
 obj.ProcessNoise=0.618;
 obj.MeasurementNoise=1; 
 
 for k = 1:size(NS)
-  [PredictedState,PredictedStateCovariance] = predict(obj);
-  [CorrectedState,CorrectedStateCovariance] = correct(obj,NS(k)); 
+  [CorrectedState,CorrectedStateCovariance] = correct(obj,NS(k),TIO(k;1)); 
+  [PredictedState,PredictedStateCovariance] = predict(obj,TIO(k;1));
   FS(k,1)=CorrectedState;
 end
 % FS=polyval(polyfit(t,FS,DtrdOdr),t);
