@@ -1,7 +1,7 @@
 clear all;clc;close all;
 %%Preparation of the ambinet test data.S is the original signal,TS is the detrended&truncated signal,NS is SVD-processed signal,FS is EKF filtered signal
 SamFreq=200;Rsl=1e-3;% Ambient test parameters
-ImDataFile1='C:\Users\Bin Peng\OneDrive - usst.edu.cn\桌面\Publication\振动与冲击（赵文昊）\data1.mat';
+ImDataFile1='C:\Users\pengbin\OneDrive - usst.edu.cn\桌面\Publication\振动与冲击\data1.mat';
 DRepos=importdata(ImDataFile1);
 IO=[DRepos.input,DRepos.output1,DRepos.output2,DRepos.output3,DRepos.output4,DRepos.output5,DRepos.output6,DRepos.output7];
 
@@ -56,9 +56,9 @@ obj.ProcessNoise=0.618;
 obj.MeasurementNoise=1; 
 
 for k = 1:size(NS)
-  [CorrectedState,CorrectedStateCovariance] = correct(obj,NS(k,1:7)',TIO(k,1)*ones(size(B,2),1)); 
+  [CorrectedState,CorrectedStateCovariance] = correct(obj,NS(k,1:7)'); 
   [PredictedState,PredictedStateCovariance] = predict(obj,TIO(k,1)*ones(size(B,2),1));
-  FS(k,1)=CorrectedState;
+  FS(1,1:7)=(D*CorrectedState)';
 end
 % FS=polyval(polyfit(t,FS,DtrdOdr),t);
 
