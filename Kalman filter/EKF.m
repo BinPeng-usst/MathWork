@@ -1,5 +1,5 @@
 clear all;clc;close all;
-%%Preparation of the ambinet test data.S is the original signal,TS is the detrended&truncated signal,NS is SVD-processed signal,FS is EKF filtered signal
+%%Preparation of the ambinet test data.S is the original signal,TIO is the detrended&truncated signal,NS is SVD-processed signal,FS is EKF filtered signal
 SamFreq=200;Rsl=1e-3;% Ambient test parameters
 ImDataFile1='C:\Users\pengbin\OneDrive - usst.edu.cn\桌面\Publication\振动与冲击\data1.mat';
 DRepos=importdata(ImDataFile1);
@@ -39,8 +39,6 @@ K=DRepos.K;
 D=DRepos.juzhen; 
 
 %% EKF construction
-% Omiga=14.55*(2*pi);Amp=mean(abs(TS7));Phase=0;% priors
-% StateTranF=@(T) (T+sign(T)*sign((1-(T/Amp)^2))*(Amp*Omiga*sqrt(sign((1-(T/Amp)^2))*(1-(T/Amp)^2)))*(1/SamFreq));
 DeltaT=1/SamFreq;
 
 Phi=[zeros(size(M)),eye(size(M));(-1)*(M^-1)*K,(-1)*(M^-1)*C];
@@ -58,24 +56,23 @@ obj.MeasurementNoise=1;
 for k = 1:size(NS)
   [CorrectedState,CorrectedStateCovariance] = correct(obj,NS(k,1:7)'); 
   [PredictedState,PredictedStateCovariance] = predict(obj,TIO(k,1)*ones(size(B,2),1));
-  FS(1,1:7)=(D*CorrectedState)';
+  FS(k,1:7)=(D*CorrectedState)';
 end
-% FS=polyval(polyfit(t,FS,DtrdOdr),t);
 
 %% PSD of the filtered signal
-[Psd0,f0]=pwelch(TS7,[],[],1024,SamFreq);%Hamming窗，默认窗长度、重叠长度和DFT点数
-[Psd1,f1]=pwelch(NS,[],[],1024,SamFreq);%Hamming窗，默认窗长度、重叠长度和DFT点数
-[Psd2,f2]=pwelch(FS,[],[],1024,SamFreq);%Hamming窗，默认窗长度、重叠长度和DFT点数
-Psd0(1:20)=0;
-Psd1(1:20)=0;
-Psd2(1:20)=0;
+[PsdT_1,f0]=pwelch(TIO(:,2),[],[],1024,SamFreq);%Hamming窗，默认窗长度、重叠长度和DFT点数
+[PsdN_1,f1]=pwelch(NS(:,1),[],[],1024,SamFreq);%Hamming窗，默认窗长度、重叠长度和DFT点数
+[PsdF_1,f2]=pwelch(FS(:,1),[],[],1024,SamFreq);%Hamming窗，默认窗长度、重叠长度和DFT点数
+PsdT_1(1:20)=0;
+PsdN_1(1:20)=0;
+PsdF_1(1:20)=0;
 
 %% Output
 figure(1)
-plot(t,TS7); hold on;
-plot(t,NS); hold on;
-plot(t,FS); 
-legend('TS','NS','FS');
+plot(t,TIO(:,2)); hold on;
+plot(t,NS(:,1)); hold on;
+plot(t,FS(:,1)); 
+legend('预处理后原纪录（TIO）','SVD分解后（NS）','EKF滤波后（FS）');
 xlabel('\fontname{宋体}时间\fontname{Times new Roman}(s)','FontSize',10);
 ylabel('\fontname{宋体}加速度\fontname{Times new Roman}(cm/s^{2})','FontSize',10);
 
@@ -88,10 +85,10 @@ RFile='C:\Users\Bin Peng\Desktop\T';
 print('-f1',RFile,'-painters','-dmeta','-r600');
 
 figure(2);
-[pks0,loc0]=max(Psd0);BsFreq0=f0(loc0);
-[pks1,loc1]=max(Psd1);BsFreq1=f1(loc1);
-[pks2,loc2]=max(Psd2);BsFreq2=f2(loc2);
-plot(f0,Psd0);hold on;
-plot(f1,Psd1);hold on;
-plot(f2,Psd2); 
-legend(['PSD of TS',' ',num2str(BsFreq0)],['PSD of NS',' ',num2str(BsFreq1)],['PSD of FS',' ',num2str(BsFreq2)]);
+[pks0,loc0]=max(PsdT_1);BsFreq0=f0(loc0);
+[pks1,loc1]=max(PsdN_1);BsFreq1=f1(loc1);
+[pks2,loc2]=max(PsdF_1);BsFreq2=f2(loc2);
+plot(f0,PsdT_1);hold on;
+plot(f1,PsdN_1);hold on;
+plot(f2,PsdF_1); 
+legend(['PSD of TIO',' ',num2str(BsFreq0)],['PSD of NS',' ',num2str(BsFreq1)],['PSD of FS',' ',num2str(BsFreq2)]);
