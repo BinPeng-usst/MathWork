@@ -44,7 +44,7 @@ for j=1:size(V_th,2)
 end
 
 % SVD decompositon the measured records
-NS=[D_th,V_th];
+NS=[D_th(:,2:8),V_th(:,2:8)];
 [U,e,V] = svd(NS,0);
 NS=U(:,1)*e(1,1)*V(1,:);
 
@@ -69,10 +69,10 @@ obj = extendedKalmanFilter(StateFcn,MeasurementFcn,NS(1,1)*ones(size(A,2),1),'St
 obj.ProcessNoise=0.618;
 obj.MeasurementNoise=1; 
 
-for k = 1:size(NS)
+for k = 1:size(NS,1)
   [CorrectedState,CorrectedStateCovariance] = correct(obj,NS(k,1:14)'); 
   [PredictedState,PredictedStateCovariance] = predict(obj,TIO(k,1)*ones(size(B,2),1));
-  FS(k,1:7)=(D*CorrectedState)';
+  FS(k,1:14)=(D*CorrectedState)';
 end
 
 %% PSD of the filtered signal
