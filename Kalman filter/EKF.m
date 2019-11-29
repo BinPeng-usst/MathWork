@@ -1,34 +1,50 @@
 clear all;clc;close all;
+
 %%Preparation of the ambinet test data.S is the original signal,TIO is the detrended&truncated signal,NS is SVD-processed signal,FS is EKF filtered signal
-SamFreq=200;Rsl=1e-3;% Ambient test parameters
+% Read data  
 ImDataFile1='C:\Users\pengbin\OneDrive - usst.edu.cn\×ÀÃæ\Publication\Õñ¶¯Óë³å»÷\data1.mat';
 DRepos=importdata(ImDataFile1);
 IO=[DRepos.input,DRepos.output1,DRepos.output2,DRepos.output3,DRepos.output4,DRepos.output5,DRepos.output6,DRepos.output7];
 
-%detrend
-DtrdOdr=2;
+% Specify ambient test parameters
+SamFreq=200;
 t=[0:1/SamFreq:(size(IO,1)-1)/SamFreq]';
+% SenseOfAcc=32.8 ;%Gal/v
+% SenseOfInstru=34.2; %Gal/v
+% GainOfInstru=1;
+% R=1/((SenseOfInstru/SenseOfAcc)*GainOfInstru);
+
+% Detrend
+DtrdOdr=2;
 for i=1:size(IO,2)
     IO(:,i)=dtrend(IO(:,i)-polyval(polyfit(t,IO(:,i),DtrdOdr),t));
 end
+for i=1:size(IO,2)
+    IO(:,i)= IO(:,i)-mean(IO(:,i));
+end
 
-%delete small voltage turbulents
+% Delete small voltage turbulents
 for i=1:size(IO,2)
     for j=1:size(IO(:,i))
-      if abs(IO(j,i))>Rsl
+      if abs(IO(j,i))>1e-3
         TIO(j,i)=IO(j,i);
-        j=j+1;
-       else
+        else
          TIO(j,i)=0;
-         j=j+1;
         end
     end
 end
 
-% SVD decompositon the output records
-for j=2:8;
-  NS(:,j-1)=TIO(:,j);
+% Integrating the acceleration to get velocity and dislacement
+for i=1:size(TIO,2)
+ V_th(:,i)=cumtrapz(t,TIO(:,i));
 end
+
+for j=1:size(V_th,2)
+ D_th(:,j)=cumtrapz(t,V_th(:,j));
+end
+
+% SVD decompositon the measured records
+NS=[D_th;V_th];
 [U,e,V] = svd(NS,0);
 NS=U(:,1)*e(1,1)*V(1,:);
 
@@ -36,7 +52,7 @@ NS=U(:,1)*e(1,1)*V(1,:);
 M=DRepos.M; 
 C=DRepos.C;
 K=DRepos.K; 
-D=DRepos.juzhen; 
+D=[DRepos.juzhen;DRepos.juzhen]; 
 
 %% EKF construction
 DeltaT=1/SamFreq;
