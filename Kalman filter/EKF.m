@@ -44,7 +44,7 @@ for j=1:size(V_th,2)
 end
 
 % SVD decompositon the measured records
-NS=[D_th;V_th];
+NS=[D_th,V_th];
 [U,e,V] = svd(NS,0);
 NS=U(:,1)*e(1,1)*V(1,:);
 
@@ -70,7 +70,7 @@ obj.ProcessNoise=0.618;
 obj.MeasurementNoise=1; 
 
 for k = 1:size(NS)
-  [CorrectedState,CorrectedStateCovariance] = correct(obj,NS(k,1:7)'); 
+  [CorrectedState,CorrectedStateCovariance] = correct(obj,NS(k,1:14)'); 
   [PredictedState,PredictedStateCovariance] = predict(obj,TIO(k,1)*ones(size(B,2),1));
   FS(k,1:7)=(D*CorrectedState)';
 end
