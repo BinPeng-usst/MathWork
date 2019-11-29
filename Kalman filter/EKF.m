@@ -8,6 +8,7 @@ IO=[DRepos.input,DRepos.output1,DRepos.output2,DRepos.output3,DRepos.output4,DRe
 
 % Specify ambient test parameters
 SamFreq=200;
+DeltaT=1/SamFreq;
 t=[0:1/SamFreq:(size(IO,1)-1)/SamFreq]';
 % SenseOfAcc=32.8 ;%Gal/v
 % SenseOfInstru=34.2; %Gal/v
@@ -44,7 +45,7 @@ for j=1:size(V_th,2)
 end
 
 % SVD decompositon the measured records
-NS=[D_th,V_th];
+NS=[D_th(:,2:8),V_th(:,2:8)];
 [U,e,V] = svd(NS,0);
 NS=U(:,1)*e(1,1)*V(1,:);
 
@@ -55,7 +56,6 @@ K=DRepos.K;
 D=[DRepos.juzhen;DRepos.juzhen]; 
 
 %% EKF construction
-DeltaT=1/SamFreq;
 
 Phi=[zeros(size(M)),eye(size(M));(-1)*(M^-1)*K,(-1)*(M^-1)*C];
 Psi=[zeros(size(M));(-1)*M];
@@ -69,26 +69,23 @@ obj = extendedKalmanFilter(StateFcn,MeasurementFcn,NS(1,1)*ones(size(A,2),1),'St
 obj.ProcessNoise=0.618;
 obj.MeasurementNoise=1; 
 
-for k = 1:size(NS)
+for k = 1:size(NS,1)
   [CorrectedState,CorrectedStateCovariance] = correct(obj,NS(k,1:14)'); 
   [PredictedState,PredictedStateCovariance] = predict(obj,TIO(k,1)*ones(size(B,2),1));
-  FS(k,1:7)=(D*CorrectedState)';
+  FS(k,1:14)=(D*CorrectedState)';
 end
 
 %% PSD of the filtered signal
 [PsdT_1,f0]=pwelch(TIO(:,2),[],[],1024,SamFreq);%Hamming窗，默认窗长度、重叠长度和DFT点数
-[PsdN_1,f1]=pwelch(NS(:,1),[],[],1024,SamFreq);%Hamming窗，默认窗长度、重叠长度和DFT点数
-[PsdF_1,f2]=pwelch(FS(:,1),[],[],1024,SamFreq);%Hamming窗，默认窗长度、重叠长度和DFT点数
+[PsdF_1,f1]=pwelch(FS(:,1),[],[],1024,SamFreq);%Hamming窗，默认窗长度、重叠长度和DFT点数
 PsdT_1(1:20)=0;
-PsdN_1(1:20)=0;
 PsdF_1(1:20)=0;
 
 %% Output
 figure(1)
 plot(t,TIO(:,2)); hold on;
-plot(t,NS(:,1)); hold on;
 plot(t,FS(:,1)); 
-legend('预处理后原纪录（TIO）','SVD分解后（NS）','EKF滤波后（FS）');
+legend('预处理后原纪录（TIO）','EKF滤波后（FS）');
 xlabel('\fontname{宋体}时间\fontname{Times new Roman}(s)','FontSize',10);
 ylabel('\fontname{宋体}加速度\fontname{Times new Roman}(cm/s^{2})','FontSize',10);
 
@@ -102,9 +99,7 @@ print('-f1',RFile,'-painters','-dmeta','-r600');
 
 figure(2);
 [pks0,loc0]=max(PsdT_1);BsFreq0=f0(loc0);
-[pks1,loc1]=max(PsdN_1);BsFreq1=f1(loc1);
-[pks2,loc2]=max(PsdF_1);BsFreq2=f2(loc2);
+[pks1,loc1]=max(PsdF_1);BsFreq1=f1(loc1);
 plot(f0,PsdT_1);hold on;
-plot(f1,PsdN_1);hold on;
-plot(f2,PsdF_1); 
-legend(['PSD of TIO',' ',num2str(BsFreq0)],['PSD of NS',' ',num2str(BsFreq1)],['PSD of FS',' ',num2str(BsFreq2)]);
+plot(f1,PsdF_1);hold on;
+legend(['PSD of TIO',' ',num2str(BsFreq0)],['PSD of FS',' ',num2str(BsFreq2)]);
