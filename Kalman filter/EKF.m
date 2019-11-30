@@ -3,7 +3,8 @@ clear all;clc;close all;
 % Read data  
 ImDataFile='C:\Users\pengbin\OneDrive - usst.edu.cn\桌面\Publication\振动与冲击\wall data\W1_data.mat';
 DRepos=importdata(ImDataFile);
-IO=[DRepos.A_input(115200:115200+65536),DRepos.A_output1(115200:115200+65536),DRepos.A_output2(115200:115200+65536),DRepos.A_output3(115200:115200+65536),DRepos.A_output4(115200:115200+65536),DRepos.A_output5(115200:115200+65536),DRepos.A_output6(115200:115200+65536),DRepos.A_output7(115200:115200+65536)];
+Fst=118200;Lnth=4096;Lst=118200+Lnth;
+IO=[DRepos.A_input(Fst:Lst),DRepos.A_output1(Fst:Lst),DRepos.A_output2(Fst:Lst),DRepos.A_output3(Fst:Lst),DRepos.A_output4(Fst:Lst),DRepos.A_output5(Fst:Lst),DRepos.A_output6(Fst:Lst),DRepos.A_output7(Fst:Lst)];
 
 % Specify ambient test parameters
 SplFreqcy=200;
@@ -72,16 +73,16 @@ for k = 1:size(NS,1)
 end
 
 %% PSD of the filtered signal
-[PsdT_1,f0]=pwelch(TIO(:,2),[],[],1024,SplFreqcy);%Hamming窗，默认窗长度、重叠长度和DFT点数
-[PsdF_1,f1]=pwelch(FS(:,1),[],[],1024,SplFreqcy);%Hamming窗，默认窗长度、重叠长度和DFT点数
-PsdT_1(1:20)=0;
-PsdF_1(1:20)=0;
+[PsdT_1,f0]=pwelch(D_th(:,2),[],[],4096,SplFreqcy);%Hamming窗，默认窗长度、重叠长度和DFT点数
+[PsdF_1,f1]=pwelch(FS(:,1),[],[],4096,SplFreqcy);%Hamming窗，默认窗长度、重叠长度和DFT点数
+PsdT_1(1)=0;
+PsdF_1(1)=0;
 
 %% Output
 figure(1)
-plot(t,TIO(:,2)); hold on;
+plot(t,D_th(:,2)); hold on;
 plot(t,FS(:,1)); 
-legend('预处理后原纪录（TIO）','EKF滤波后（FS）');
+legend('\fontname{宋体}预处理后原纪录\fontname{Times new Roman}(D-th)','EKF\fontname{宋体}滤波后\fontname{Times new Roman}(FS)');
 xlabel('\fontname{宋体}时间\fontname{Times new Roman}(s)','FontSize',10);
 ylabel('\fontname{宋体}加速度\fontname{Times new Roman}(cm/s^{2})','FontSize',10);
 
@@ -90,14 +91,12 @@ ylabel('\fontname{宋体}加速度\fontname{Times new Roman}(cm/s^{2})','FontSize',10
 % ax.Position=[left bottom ax_width ax_height];
 set(gca,'FontName','Times new Roman','FontSize',11);
 set(gcf,'Units','centimeters','Position',[0 0 16 16],'Resize','off');
-RFile='C:\Users\Bin Peng\Desktop\T';
+RFile='C:\Users\pengbin\Desktop\T';
 print('-f1',RFile,'-painters','-dmeta','-r600');
 
 figure(2);
-[pks0,loc0]=max(PsdT_1);BsFreq0=f0(loc0);
-[pks1,loc1]=max(PsdF_1);BsFreq1=f1(loc1);
+[pks0,loc0]=max(PsdT_1);BscFreq0=f0(loc0);
+[pks1,loc1]=max(PsdF_1);BscFreq1=f1(loc1);
 plot(f0,PsdT_1);hold on;
 plot(f1,PsdF_1);hold on;
-legend(['PSD of TIO',' ',num2str(BsFreq0)],['PSD of FS',' ',num2str(BsFreq2)]);
-
-
+legend(['PSD of D-th (Hz)',' ',num2str(BscFreq0)],['PSD of FS (Hz)',' ',num2str(BscFreq1)]);
