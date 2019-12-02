@@ -1,7 +1,7 @@
 clear all;clc;close all;
 %%Preparation of the ambinet test data.S is the original signal,TIO is the detrended&truncated signal,NS is SVD-processed signal,FS is EKF filtered signal
 % Read data  
-ImDataFile='C:\Users\pengbin\OneDrive - usst.edu.cn\桌面\Publication\振动与冲击\wall data\W1_data.mat';
+ImDataFile='C:\Users\pengbin\OneDrive - usst.edu.cn\桌面\Publication\振动与冲击\wall data\W2_data.mat';
 DRepos=importdata(ImDataFile);
 Fst=118200;Lnth=4096;Lst=118200+Lnth;
 IO=[DRepos.A_input(Fst:Lst),DRepos.A_output1(Fst:Lst),DRepos.A_output2(Fst:Lst),DRepos.A_output3(Fst:Lst),DRepos.A_output4(Fst:Lst),DRepos.A_output5(Fst:Lst),DRepos.A_output6(Fst:Lst),DRepos.A_output7(Fst:Lst)];
@@ -34,15 +34,17 @@ end
 
 % Integrating the acceleration to get velocity and dislacement
 for i=1:size(TIO,2)
- V_th(:,i)=cumtrapz(t,TIO(:,i));
+V_th(:,i)=cumtrapz(t,TIO(:,i));
 end
 
 for j=1:size(V_th,2)
- D_th(:,j)=cumtrapz(t,V_th(:,j));
+D_th(:,j)=cumtrapz(t,V_th(:,j));
 end
 
-% SVD decompositon the measured records
+% Form the measurement matrix
 NS=[D_th(:,2:8),V_th(:,2:8)];
+
+% SVD decompositon the measurement matrix
 [U,e,V] = svd(NS,0);
 NS=U(:,1)*e(1,1)*V(1,:);
 
@@ -62,7 +64,7 @@ B=(Phi^-1)*(1-(expm(Phi*DeltaT))^-1)*Psi;
 
 StateFcn=@(X,U)(A*X+B*U);
 MeasurementFcn=@(Y)(D*Y);
-obj = extendedKalmanFilter(StateFcn,MeasurementFcn,NS(1,1)*ones(size(A,2),1),'StateCovariance',5);
+obj = extendedKalmanFilter(StateFcn,MeasurementFcn,zeros(size(A,2),1),'StateCovariance',5);
 obj.ProcessNoise=0.618;
 obj.MeasurementNoise=1; 
 
@@ -80,8 +82,8 @@ PsdF_1(1)=0;
 
 %% Output
 figure(1)
-plot(t,D_th(:,2)); hold on;
-plot(t,FS(:,1)); 
+plot(t,D_th(:,3)); hold on;
+plot(t,FS(:,2)+max(FS(:,2)+max(D_th(:,3)))); 
 legend('\fontname{宋体}预处理后原纪录\fontname{Times new Roman}(D-th)','EKF\fontname{宋体}滤波后\fontname{Times new Roman}(FS)');
 xlabel('\fontname{宋体}时间\fontname{Times new Roman}(s)','FontSize',10);
 ylabel('\fontname{宋体}加速度\fontname{Times new Roman}(cm/s^{2})','FontSize',10);
