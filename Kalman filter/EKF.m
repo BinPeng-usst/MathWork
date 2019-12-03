@@ -1,11 +1,15 @@
 clear all;clc;close all;
 %%Preparation of the ambinet test data.S is the original signal,TIO is the detrended&truncated signal,NS is SVD-processed signal,FS is EKF filtered signal
 % Read data  
-ImDataFile='C:\Users\pengbin\OneDrive - usst.edu.cn\桌面\Publication\振动与冲击\wall data\W2_data.mat';
+ImDataFile='C:\Users\Bin Peng\OneDrive - usst.edu.cn\桌面\Publication\振动与冲击\wall data\W1_data.mat';
 DRepos=importdata(ImDataFile);
 Fst=118200;Lnth=4096;Lst=118200+Lnth;
-IO=[DRepos.A_input(Fst:Lst),DRepos.A_output1(Fst:Lst),DRepos.A_output2(Fst:Lst),DRepos.A_output3(Fst:Lst),DRepos.A_output4(Fst:Lst),DRepos.A_output5(Fst:Lst),DRepos.A_output6(Fst:Lst),DRepos.A_output7(Fst:Lst)];
-
+IOA=[DRepos.A_input(Fst:Lst),DRepos.A_output1(Fst:Lst),DRepos.A_output2(Fst:Lst),DRepos.A_output3(Fst:Lst),DRepos.A_output4(Fst:Lst),DRepos.A_output5(Fst:Lst),DRepos.A_output6(Fst:Lst),DRepos.A_output7(Fst:Lst)];
+IOB=[DRepos.B_input(Fst:Lst),DRepos.B_output1(Fst:Lst),DRepos.B_output2(Fst:Lst),DRepos.B_output3(Fst:Lst),DRepos.B_output4(Fst:Lst),DRepos.B_output5(Fst:Lst),DRepos.B_output6(Fst:Lst),DRepos.B_output7(Fst:Lst)];
+IO1=[DRepos.C_input(Fst:Lst),DRepos.C_output1(Fst:Lst),DRepos.C_output2(Fst:Lst),DRepos.C_output3(Fst:Lst),DRepos.C_output4(Fst:Lst),DRepos.C_output5(Fst:Lst),DRepos.C_output6(Fst:Lst),DRepos.C_output7(Fst:Lst)];
+IO2=[DRepos.D_input(Fst:Lst),DRepos.D_output1(Fst:Lst),DRepos.D_output2(Fst:Lst),DRepos.D_output3(Fst:Lst),DRepos.D_output4(Fst:Lst),DRepos.D_output5(Fst:Lst),DRepos.D_output6(Fst:Lst),DRepos.D_output7(Fst:Lst)];
+IO3=[DRepos.E_input(Fst:Lst),DRepos.E_output1(Fst:Lst),DRepos.E_output2(Fst:Lst),DRepos.E_output3(Fst:Lst),DRepos.E_output4(Fst:Lst),DRepos.E_output5(Fst:Lst),DRepos.E_output6(Fst:Lst),DRepos.E_output7(Fst:Lst)];
+IO=IOB;
 % Specify ambient test parameters
 SplFreqcy=200;
 DeltaT=1/SplFreqcy;
@@ -82,21 +86,22 @@ PsdF_1(1)=0;
 
 %% Output
 figure(1)
+subplot(2,2,[1,2]);
+for i=1:8
+    plot3(t,i*ones(size(t,1),1),V_th(:,i));hold on;
+end
+    
+subplot(2,2,3);
 plot(t,D_th(:,3)); hold on;
 plot(t,FS(:,2)+max(FS(:,2)+max(D_th(:,3)))); 
 legend('\fontname{宋体}预处理后原纪录\fontname{Times new Roman}(D-th)','EKF\fontname{宋体}滤波后\fontname{Times new Roman}(FS)');
 xlabel('\fontname{宋体}时间\fontname{Times new Roman}(s)','FontSize',10);
 ylabel('\fontname{宋体}加速度\fontname{Times new Roman}(cm/s^{2})','FontSize',10);
-
-% ax=gca;outerpos=ax.OuterPosition;ti=ax.TightInset; 
-% left=outerpos(1)+ti(1);bottom=outerpos(2)+ti(2);ax_width=outerpos(3)-ti(1)-ti(3);ax_height=outerpos(4)-ti(2)-ti(4);
-% ax.Position=[left bottom ax_width ax_height];
-set(gca,'FontName','Times new Roman','FontSize',11);
-set(gcf,'Units','centimeters','Position',[0 0 16 16],'Resize','off');
-RFile='C:\Users\pengbin\Desktop\T';
-print('-f1',RFile,'-painters','-dmeta','-r600');
-
-figure(2);
+% set(gca,'FontName','Times new Roman','FontSize',11);
+% set(gcf,'Units','centimeters','Position',[0 0 16 16],'Resize','off');
+% RFile='C:\Users\pengbin\Desktop\T';
+% print('-f1',RFile,'-painters','-dmeta','-r600');
+subplot(2,2,4);
 [pks0,loc0]=max(PsdT_1);BscFreq0=f0(loc0);
 [pks1,loc1]=max(PsdF_1);BscFreq1=f1(loc1);
 plot(f0,PsdT_1);hold on;
