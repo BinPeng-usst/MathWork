@@ -1,15 +1,16 @@
 clear all;clc;close all;
 %%Preparation of the ambinet test data.S is the original signal,TIO is the detrended&truncated signal,NS is SVD-processed signal,FS is EKF filtered signal
 % Read data  
-ImDataFile='C:\Users\Bin Peng\OneDrive - usst.edu.cn\桌面\Publication\振动与冲击\wall data\W1_data.mat';
+ImDataFile='C:\Users\Bin Peng\OneDrive - usst.edu.cn\桌面\Publication\振动与冲击\walldataT\W1T_data.mat';
 DRepos=importdata(ImDataFile);
-Fst=118200;Lnth=4096;Lst=118200+Lnth;
-IOA=[DRepos.A_input(Fst:Lst),DRepos.A_output1(Fst:Lst),DRepos.A_output2(Fst:Lst),DRepos.A_output3(Fst:Lst),DRepos.A_output4(Fst:Lst),DRepos.A_output5(Fst:Lst),DRepos.A_output6(Fst:Lst),DRepos.A_output7(Fst:Lst)];
-IOB=[DRepos.B_input(Fst:Lst),DRepos.B_output1(Fst:Lst),DRepos.B_output2(Fst:Lst),DRepos.B_output3(Fst:Lst),DRepos.B_output4(Fst:Lst),DRepos.B_output5(Fst:Lst),DRepos.B_output6(Fst:Lst),DRepos.B_output7(Fst:Lst)];
-IO1=[DRepos.C_input(Fst:Lst),DRepos.C_output1(Fst:Lst),DRepos.C_output2(Fst:Lst),DRepos.C_output3(Fst:Lst),DRepos.C_output4(Fst:Lst),DRepos.C_output5(Fst:Lst),DRepos.C_output6(Fst:Lst),DRepos.C_output7(Fst:Lst)];
-IO2=[DRepos.D_input(Fst:Lst),DRepos.D_output1(Fst:Lst),DRepos.D_output2(Fst:Lst),DRepos.D_output3(Fst:Lst),DRepos.D_output4(Fst:Lst),DRepos.D_output5(Fst:Lst),DRepos.D_output6(Fst:Lst),DRepos.D_output7(Fst:Lst)];
-IO3=[DRepos.E_input(Fst:Lst),DRepos.E_output1(Fst:Lst),DRepos.E_output2(Fst:Lst),DRepos.E_output3(Fst:Lst),DRepos.E_output4(Fst:Lst),DRepos.E_output5(Fst:Lst),DRepos.E_output6(Fst:Lst),DRepos.E_output7(Fst:Lst)];
+Fst=1;Lnth=4095;Lst=Fst+Lnth;
+IOA=[DRepos.A_input1T(Fst:Lst),DRepos.A_output1T(Fst:Lst),DRepos.A_output2T(Fst:Lst),DRepos.A_output3T(Fst:Lst),DRepos.A_output4T(Fst:Lst),DRepos.A_output5T(Fst:Lst),DRepos.A_output6T(Fst:Lst),DRepos.A_output7T(Fst:Lst)];
+IOB=[DRepos.B_input1T(Fst:Lst),DRepos.B_output1T(Fst:Lst),DRepos.B_output2T(Fst:Lst),DRepos.B_output3T(Fst:Lst),DRepos.B_output4T(Fst:Lst),DRepos.B_output5T(Fst:Lst),DRepos.B_output6T(Fst:Lst),DRepos.B_output7T(Fst:Lst)];
+IO1=[DRepos.C_input1T(Fst:Lst),DRepos.C_output1T(Fst:Lst),DRepos.C_output2T(Fst:Lst),DRepos.C_output3T(Fst:Lst),DRepos.C_output4T(Fst:Lst),DRepos.C_output5T(Fst:Lst),DRepos.C_output6T(Fst:Lst),DRepos.C_output7T(Fst:Lst)];
+IO2=[DRepos.D_input1T(Fst:Lst),DRepos.D_output1T(Fst:Lst),DRepos.D_output2T(Fst:Lst),DRepos.D_output3T(Fst:Lst),DRepos.D_output4T(Fst:Lst),DRepos.D_output5T(Fst:Lst),DRepos.D_output6T(Fst:Lst),DRepos.D_output7T(Fst:Lst)];
+IO3=[DRepos.E_input1T(Fst:Lst),DRepos.E_output1T(Fst:Lst),DRepos.E_output2T(Fst:Lst),DRepos.E_output3T(Fst:Lst),DRepos.E_output4T(Fst:Lst),DRepos.E_output5T(Fst:Lst),DRepos.E_output6T(Fst:Lst),DRepos.E_output7T(Fst:Lst)];
 IO=IOB;
+
 % Specify ambient test parameters
 SplFreqcy=200;
 DeltaT=1/SplFreqcy;
@@ -26,19 +27,19 @@ for i=1:size(IO,2)
 end
 
 % Delete small voltage turbulents
-for i=1:size(IO,2)
-    for j=1:size(IO(:,i))
-      if abs(IO(j,i))>1e-3
-        TIO(j,i)=IO(j,i);
-        else
-         TIO(j,i)=0;
-        end
-    end
-end
+% for i=1:size(IO,2)
+%     for j=1:size(IO(:,i))
+%       if abs(IO(j,i))>1e-3
+%         IO(j,i)=IO(j,i);
+%         else
+%          IO(j,i)=0;
+%         end
+%     end
+% end
 
 % Integrating the acceleration to get velocity and dislacement
-for i=1:size(TIO,2)
-V_th(:,i)=cumtrapz(t,TIO(:,i));
+for i=1:size(IO,2)
+V_th(:,i)=cumtrapz(t,IO(:,i));
 end
 
 for j=1:size(V_th,2)
@@ -74,7 +75,7 @@ obj.MeasurementNoise=1;
 
 for k = 1:size(NS,1)
   [CorrectedState,CorrectedStateCovariance] = correct(obj,NS(k,1:14)'); 
-  [PredictedState,PredictedStateCovariance] = predict(obj,TIO(k,1)*ones(size(B,2),1));
+  [PredictedState,PredictedStateCovariance] = predict(obj,IO(k,1)*ones(size(B,2),1));
   FS(k,1:14)=(D*CorrectedState)';
 end
 
@@ -92,8 +93,8 @@ for i=1:8
 end
     
 subplot(2,2,3);
-plot(t,D_th(:,3)); hold on;
-plot(t,FS(:,2)+max(FS(:,2)+max(D_th(:,3)))); 
+plot(t,D_th(:,2)); hold on;
+plot(t,FS(:,1)+max(FS(:,1)+max(D_th(:,1)))); 
 legend('\fontname{宋体}预处理后原纪录\fontname{Times new Roman}(D-th)','EKF\fontname{宋体}滤波后\fontname{Times new Roman}(FS)');
 xlabel('\fontname{宋体}时间\fontname{Times new Roman}(s)','FontSize',10);
 ylabel('\fontname{宋体}加速度\fontname{Times new Roman}(cm/s^{2})','FontSize',10);
