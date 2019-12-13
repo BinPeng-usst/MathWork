@@ -47,11 +47,14 @@ D_th(:,j)=cumtrapz(t,V_th(:,j));
 end
 
 % Form the measurement matrix
-NS=[D_th(:,2:8),V_th(:,2:8)];
-
-% SVD decompositon the measurement matrix
-[U,e,V] = svd(NS,0);
-NS=U(:,1)*e(1,1)*V(1,:);
+[U1,e1,V1] = svd(D_th(:,2:8),0)
+NS1=U1(:,1)*e1(1,1)*V1(1,:);
+[U2,e2,V2] = svd(V_th(:,2:8),0)
+NS2=U2(:,1)*e2(1,1)*V2(1,:);
+NS=[NS1,NS2];
+% % SVD decompositon the measurement matrix
+% [U,e,V] = svd(NS,0);
+% NS=U(:,1)*e(1,1)*V(1,:);
 
 %% Preparation of structural matricies
 M=DRepos.M; 
@@ -81,21 +84,23 @@ end
 
 %% PSD of the filtered signal
 [PsdT_1,f0]=pwelch(D_th(:,2),[],[],4096,SplFreqcy);%Hamming窗，默认窗长度、重叠长度和DFT点数
-[PsdF_1,f1]=pwelch(FS(:,1),[],[],4096,SplFreqcy);%Hamming窗，默认窗长度、重叠长度和DFT点数
-PsdT_1(1)=0;
-PsdF_1(1)=0;
+[PsdN_1,f1]=pwelch(NS(:,1),[],[],4096,SplFreqcy);%Hamming窗，默认窗长度、重叠长度和DFT点数
+[PsdF_1,f2]=pwelch(FS(:,1),[],[],4096,SplFreqcy);%Hamming窗，默认窗长度、重叠长度和DFT点数
+% PsdT_1(1)=0;
+% PsdF_1(1)=0;
 
 %% Output
 figure(1)
 subplot(2,2,[1,2]);
 for i=1:8
-    plot3(t,i*ones(size(t,1),1),V_th(:,i));hold on;
+    plot3(t,i*ones(size(t,1),1),D_th(:,i));hold on;
 end
     
 subplot(2,2,3);
 plot(t,D_th(:,2)); hold on;
-plot(t,FS(:,1)+max(FS(:,1)+max(D_th(:,1)))); 
-legend('\fontname{宋体}预处理后原纪录\fontname{Times new Roman}(D-th)','EKF\fontname{宋体}滤波后\fontname{Times new Roman}(FS)');
+plot(t,NS(:,1)+max(NS(:,1)+max(D_th(:,1)))); 
+plot(t,FS(:,1)+max(FS(:,1)+max(NS(:,1))+max(D_th(:,1)))); 
+legend('\fontname{宋体}预处理后原纪录\fontname{Times new Roman}(D-th)','SVD\fontname{宋体}分解重构\fontname{Times new Roman}(NS)','EKF\fontname{宋体}滤波后\fontname{Times new Roman}(FS)');
 xlabel('\fontname{宋体}时间\fontname{Times new Roman}(s)','FontSize',10);
 ylabel('\fontname{宋体}加速度\fontname{Times new Roman}(cm/s^{2})','FontSize',10);
 % set(gca,'FontName','Times new Roman','FontSize',11);
@@ -104,7 +109,9 @@ ylabel('\fontname{宋体}加速度\fontname{Times new Roman}(cm/s^{2})','FontSize',10
 % print('-f1',RFile,'-painters','-dmeta','-r600');
 subplot(2,2,4);
 [pks0,loc0]=max(PsdT_1);BscFreq0=f0(loc0);
-[pks1,loc1]=max(PsdF_1);BscFreq1=f1(loc1);
+[pks1,loc1]=max(PsdN_1);BscFreq1=f1(loc1);
+[pks2,loc2]=max(PsdF_1);BscFreq2=f2(loc2);
 plot(f0,PsdT_1);hold on;
-plot(f1,PsdF_1);hold on;
-legend(['PSD of D-th (Hz)',' ',num2str(BscFreq0)],['PSD of FS (Hz)',' ',num2str(BscFreq1)]);
+plot(f1,PsdN_1);hold on;
+plot(f2,PsdF_1);hold on;
+legend(['PSD of D-th (Hz)',' ',num2str(BscFreq0)],['PSD of NS (Hz)',' ',num2str(BscFreq1)],['PSD of FS (Hz)',' ',num2str(BscFreq2)]);
