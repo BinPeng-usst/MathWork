@@ -93,12 +93,14 @@ obj = extendedKalmanFilter(StateFcn,MeasurementFcn,zeros(size(A,2),1),'StateCova
 obj.ProcessNoise=PcsNse;
 obj.MeasurementNoise=MsmtNse; 
 
-waitbar(0,'Working');
+h=waitbar(0,'Working');
+tic;
 for k = 1:size(NS,1)
   [CorrectedState,CorrectedStateCovariance] = correct(obj,NS(k,1:2)'); 
   [PredictedState,PredictedStateCovariance] = predict(obj,IO(k,1)*ones(size(B,2),1));
   FS(k,1:14)=(D*CorrectedState)';
-  waitbar(k/size(NS,1));
+  time=toc;
+  waitbar(k/size(NS,1),h,num2str(time)+"s");
 end
 
 %% PSD of the filtered signal
