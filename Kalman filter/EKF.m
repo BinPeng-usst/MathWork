@@ -65,9 +65,10 @@ end
 
 % Form the measurement matrix
 [U1,e1,V1] = svd(D_th(:,2:8),0);
-NS1=U1(:,1)*e1(1,1)*V1(1,:);
+NS1=D_th(:,2:8)*V1(:,1);
+
 [U2,e2,V2] = svd(V_th(:,2:8),0);
-NS2=U2(:,1)*e2(1,1)*V2(1,:);
+NS2=V_th(:,2:8)*V2(:,1);
 NS=[NS1,NS2];
 % % SVD decompositon the measurement matrix
 % [U,e,V] = svd(NS,0);
@@ -80,7 +81,6 @@ K=DRepos.K;
 D=[DRepos.juzhen;DRepos.juzhen]; 
 
 %% EKF construction
-
 Phi=[zeros(size(M)),eye(size(M));(-1)*(M^-1)*K,(-1)*(M^-1)*C];
 Psi=[zeros(size(M));(-1)*M];
 
@@ -88,15 +88,17 @@ A=expm(Phi*DeltaT);
 B=(Phi^-1)*(1-(expm(Phi*DeltaT))^-1)*Psi;
 
 StateFcn=@(X,U)(A*X+B*U);
-MeasurementFcn=@(Y)(D*Y);
+MeasurementFcn=@(Y) PC(D*Y);
 obj = extendedKalmanFilter(StateFcn,MeasurementFcn,zeros(size(A,2),1),'StateCovariance',5);
 obj.ProcessNoise=PcsNse;
 obj.MeasurementNoise=MsmtNse; 
 
+waitbar(0,'Working');
 for k = 1:size(NS,1)
-  [CorrectedState,CorrectedStateCovariance] = correct(obj,NS(k,1:14)'); 
+  [CorrectedState,CorrectedStateCovariance] = correct(obj,NS(k,1:2)'); 
   [PredictedState,PredictedStateCovariance] = predict(obj,IO(k,1)*ones(size(B,2),1));
   FS(k,1:14)=(D*CorrectedState)';
+  waitbar(k/size(NS,1));
 end
 
 %% PSD of the filtered signal
@@ -132,3 +134,13 @@ plot(f0,PsdT_1);hold on;
 plot(f1,PsdN_1);hold on;
 plot(f2,PsdF_1);hold on;
 legend(['PSD of D-th (Hz)',' ',num2str(BscFreq0)],['PSD of NS (Hz)',' ',num2str(BscFreq1)],['PSD of FS (Hz)',' ',num2str(BscFreq2)],'Location','best');
+
+%% functions
+function Q=PC(P)
+[Ua,ea,Va] = svd(P(1:7,1));
+NSA=Ua(1,:)*P(1:7,1);
+
+[Ub,eb,Vb] = svd(P(8:14,1));
+NSB=Ub(1,:)*P(8:14,1);
+Q=[NSA;NSB];
+end
