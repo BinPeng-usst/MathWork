@@ -75,20 +75,21 @@ NS=[D_th(:,2:8),V_th(:,2:8)];
 
 %% Preparation of structural matricies
 M=DRepos.M; 
-C=DRepos.C;
 K=DRepos.K; 
+% C=DRepos.C;
+C=2*sqrt(M'*K);
 D=[DRepos.juzhen;DRepos.juzhen]; 
 
 %% EKF construction
 Phi=[zeros(size(M)),eye(size(M));(-1)*(M^-1)*K,(-1)*(M^-1)*C];
-Psi=[zeros(size(M));(-1)*M];
+Psi=[zeros(size(M));(-1)*eye(size(M))];
 
 A=expm(Phi*DeltaT);
-B=(Phi^-1)*(1-(expm(Phi*DeltaT))^-1)*Psi;
+B=(Phi^-1)*(((expm(Phi*DeltaT))^-1)-1)*Psi;
 
 StateFcn=@(X,U)(A*X+B*U);
 MeasurementFcn=@(Y) D*Y;
-obj = extendedKalmanFilter(StateFcn,MeasurementFcn,zeros(size(A,2),1),'StateCovariance',5);
+obj = extendedKalmanFilter(StateFcn,MeasurementFcn,zeros(size(A,2),1),'StateCovariance',0.1);
 obj.ProcessNoise=PcsNse;
 obj.MeasurementNoise=MsmtNse; 
 
@@ -102,7 +103,7 @@ for k = 1:size(NS,1)
   waitbar(k/size(NS,1),h,num2str(k/size(NS,1),'%.1f')+"    "+num2str(hrs)+":"+num2str(mnts)+":"+num2str(secs,'%.1f'));
 end
 h.delete;
-FS=PC(FS);
+% FS=PC(FS);
 
 %% PSD of the filtered signal
 [PsdT_1,f0]=pwelch(D_th(:,2),[],[],[],SplFreqcy);%Hamming窗，默认窗长度、重叠长度和DFT点数
