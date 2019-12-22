@@ -1,7 +1,7 @@
 clear all;clc;close all;
 %%Preparation of the ambinet test data.IO is the detrended&truncated original signal, NS is SVDed signal, FS is EKFed signal
 % Read data  
-ImDataFile='C:\Users\pengbin\OneDrive - usst.edu.cn\桌面\Publication\振动与冲击\walldataT\W1T_data.mat';
+ImDataFile='C:\Users\Bin Peng\OneDrive - usst.edu.cn\桌面\Publication\振动与冲击\walldataT\W1T_data.mat';
 DRepos=importdata(ImDataFile);
 Fst=1;Lnth=4095;Lst=Fst+Lnth;SclFtr=0.01;
 IOA=[DRepos.A_input1T(Fst:Lst),DRepos.A_output1T(Fst:Lst),DRepos.A_output2T(Fst:Lst),DRepos.A_output3T(Fst:Lst),DRepos.A_output4T(Fst:Lst),DRepos.A_output5T(Fst:Lst),DRepos.A_output6T(Fst:Lst),DRepos.A_output7T(Fst:Lst)];
@@ -76,7 +76,7 @@ NS=[D_th(:,2:8),V_th(:,2:8)];
 M=DRepos.M; 
 K=DRepos.K; 
 % C=DRepos.C;
-C=0.000000002*sqrtm(M'*K);
+C=0.05*2*sqrtm(M'*K);
 D=[DRepos.juzhen;DRepos.juzhen]; 
 
 %% EKF construction
@@ -84,13 +84,13 @@ Phi=[zeros(size(M)),eye(size(M));(-1)*(M^-1)*K,(-1)*(M^-1)*C];
 Psi=[zeros(size(M));(-1)*eye(size(M))];
 
 A=expm(Phi*DeltaT);
-B=(Phi^-1)*(((expm(Phi*DeltaT))^-1)-1)*Psi;
+B=(Phi^-1)*(1-expm((-1)*Phi*DeltaT))*Psi;
 
 StateFcn=@(X,U)(A*X+B*U);
 MeasurementFcn=@(Y) D*Y;
-obj = extendedKalmanFilter(StateFcn,MeasurementFcn,zeros(size(A,2),1),'StateCovariance',0.1);
-obj.MeasurementNoise=mean(std(IO))/size(IO,2);
-obj.ProcessNoise=0.1*mean(std(IO))/size(IO,2);
+obj = extendedKalmanFilter(StateFcn,MeasurementFcn,zeros(size(A,2),1),'StateCovariance',1.5e-6);
+obj.MeasurementNoise=0.1*mean(std(IO)')/size(IO,2);
+obj.ProcessNoise=mean(std(IO)')/size(IO,2);
 
 
 h=waitbar(0,'Working');
