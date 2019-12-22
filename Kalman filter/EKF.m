@@ -25,8 +25,7 @@ IO3=[DRepos.E_input1T(Fst:Lst),DRepos.E_output1T(Fst:Lst),DRepos.E_output2T(Fst:
 % IO3=[DRepos.E_input(Fst:Lst),DRepos.E_output1(Fst:Lst),DRepos.E_output2(Fst:Lst),DRepos.E_output3(Fst:Lst),DRepos.E_output4(Fst:Lst),DRepos.E_output5(Fst:Lst),DRepos.E_output6(Fst:Lst),DRepos.E_output7(Fst:Lst)];
 
 IO=IO3*SclFtr;
-MsmtNse=mean(std(IO))/size(IO,2);
-PcsNse=0.1*MsmtNse;
+
 
 % Specify ambient test parameters
 SplFreqcy=200;
@@ -77,7 +76,7 @@ NS=[D_th(:,2:8),V_th(:,2:8)];
 M=DRepos.M; 
 K=DRepos.K; 
 % C=DRepos.C;
-C=2*sqrt(M'*K);
+C=0.000000002*sqrtm(M'*K);
 D=[DRepos.juzhen;DRepos.juzhen]; 
 
 %% EKF construction
@@ -90,8 +89,9 @@ B=(Phi^-1)*(((expm(Phi*DeltaT))^-1)-1)*Psi;
 StateFcn=@(X,U)(A*X+B*U);
 MeasurementFcn=@(Y) D*Y;
 obj = extendedKalmanFilter(StateFcn,MeasurementFcn,zeros(size(A,2),1),'StateCovariance',0.1);
-obj.ProcessNoise=PcsNse;
-obj.MeasurementNoise=MsmtNse; 
+obj.MeasurementNoise=mean(std(IO))/size(IO,2);
+obj.ProcessNoise=0.1*mean(std(IO))/size(IO,2);
+
 
 h=waitbar(0,'Working');
 tic;
