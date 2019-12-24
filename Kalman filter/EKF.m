@@ -55,7 +55,20 @@ end
 
 % Integrating the acceleration to get velocity and dislacement
 for i=1:size(IO,2)
-V_th(:,i)=cumtrapz(t,IO(:,i));
+   iD_th=fft(IO(:,i),size(IO(:,i),1));
+   for k=1:size(iD_th,1)/2
+     iV_th(k,1)=iD_th(k+1,1)/(k*(SplFreqcy/size(IO(:,i),1))*sqrt(-1));
+   end
+   for k=size(iD_th,1)/2+1:size(iD_th,1)-1
+     iV_th(k,1)=iD_th(k+1,1)/((size(iD_th,1)-k)*(SplFreqcy/size(IO(:,i),1))*sqrt(-1));
+   end   
+   A=mean(abs(iV_th));
+   for k=1:size(iV_th,1)
+     iV_th(k+1,1)=iV_th(k,1);
+   end   
+   iV_th(1,1)=A;   
+   V_th(:,i)=ifft(iV_th,size(iV_th,1));
+%  V_th(:,i)=cumtrapz(t,IO(:,i));
 end
 
 for j=1:size(V_th,2)
