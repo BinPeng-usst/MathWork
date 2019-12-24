@@ -55,6 +55,7 @@ end
 
 % Integrating the acceleration to get velocity and dislacement
 for i=1:size(IO,2)
+%%%%%%%%频域法    
 %    iD_th=fft(IO(:,i));
 %    for k=1:size(iD_th,1)/2
 %      iV_th(k,1)=iD_th(k,1)/(k*2*pi*(SplFreqcy/size(IO(:,i),1))*j);
@@ -63,7 +64,8 @@ for i=1:size(IO,2)
 %      iV_th(k,1)= iV_th(size(iD_th,1)-k+1,1);
 %    end
 %    V_th(:,i)=ifft(iV_th,'symmetric');
- V_th(:,i)=cumtrapz(t,IO(:,i));
+%%%%%%%%%%直接积分法
+  V_th(:,i)=cumtrapz(t,IO(:,i));
 end
 
 for j=1:size(V_th,2)
