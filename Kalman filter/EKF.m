@@ -86,7 +86,7 @@ NS=[D_th(:,2:8),V_th(:,2:8)];
 M=DRepos.M; 
 K=DRepos.K; 
 % C=DRepos.C;
-C=0.05*2*sqrtm(M'*K);
+C=0.5*2*sqrtm(M'*K);
 D=[DRepos.juzhen;DRepos.juzhen]; 
 
 %% EKF construction
@@ -94,7 +94,7 @@ Phi=[zeros(size(M)),eye(size(M));(-1)*(M^-1)*K,(-1)*(M^-1)*C];
 Psi=[zeros(size(M));(-1)*eye(size(M))];
 
 A=expm(Phi*DeltaT);
-B=(Phi^-1)*(1-expm((-1)*Phi*DeltaT))*Psi;
+B=(Phi^-1)*(eye(size(Phi))-expm((-1)*Phi*DeltaT))*Psi;
 
 StateFcn=@(X,U)(A*X+B*U);
 MeasurementFcn=@(Y) D*Y;
