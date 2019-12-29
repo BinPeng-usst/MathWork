@@ -1,7 +1,7 @@
 clear all;clc;close all;
 %%Preparation of the ambinet test data.IO is the detrended&truncated original signal, NS is SVDed signal, FS is EKFed signal
 % Read data  
-ImDataFile='C:\Users\Bin Peng\OneDrive - usst.edu.cn\桌面\Publication\振动与冲击\walldataT\W1T_data.mat';
+ImDataFile='C:\Users\pengbin\OneDrive - usst.edu.cn\桌面\Publication\振动与冲击\walldataT\W1T_data.mat';
 DRepos=importdata(ImDataFile);
 Fst=1;Lnth=4095;Lst=Fst+Lnth;SclFtr=0.01;
 IOA=[DRepos.A_input1T(Fst:Lst),DRepos.A_output1T(Fst:Lst),DRepos.A_output2T(Fst:Lst),DRepos.A_output3T(Fst:Lst),DRepos.A_output4T(Fst:Lst),DRepos.A_output5T(Fst:Lst),DRepos.A_output6T(Fst:Lst),DRepos.A_output7T(Fst:Lst)];
@@ -24,8 +24,7 @@ IO3=[DRepos.E_input1T(Fst:Lst),DRepos.E_output1T(Fst:Lst),DRepos.E_output2T(Fst:
 % Fst=1;Lnth=size(DRepos.E_input,1)-1;Lst=Fst+Lnth;SclFtr=0.01;
 % IO3=[DRepos.E_input(Fst:Lst),DRepos.E_output1(Fst:Lst),DRepos.E_output2(Fst:Lst),DRepos.E_output3(Fst:Lst),DRepos.E_output4(Fst:Lst),DRepos.E_output5(Fst:Lst),DRepos.E_output6(Fst:Lst),DRepos.E_output7(Fst:Lst)];
 
-IO=IO3*SclFtr;
-
+IO=IO1*SclFtr;
 
 % Specify ambient test parameters
 SplFreqcy=200;
@@ -36,13 +35,14 @@ t=[0:1/SplFreqcy:(size(IO,1)-1)/SplFreqcy]';
 % GainOfInstru=1;
 % R=1/((SenseOfInstru/SenseOfAcc)*GainOfInstru);
 
-% Detrend
-DtrdOdr=2;
+%% Detrend
+DtrdOdr=1;
 for i=1:size(IO,2)
-    IO(:,i)=dtrend(IO(:,i)-polyval(polyfit(t,IO(:,i),DtrdOdr),t));
+%     IO(:,i)=detrend(IO(:,i)-polyval(polyfit(t,IO(:,i),DtrdOdr),t));
+      IO(:,i)=detrend(IO(:,i));
 end
 
-% Delete small voltage turbulents
+%% Delete small voltage turbulents
 % for i=1:size(IO,2)
 %     for j=1:size(IO(:,i))
 %       if abs(IO(j,i))>1e-3
@@ -53,7 +53,7 @@ end
 %     end
 % end
 
-% Integrating the acceleration to get velocity and dislacement
+%% Integrating the acceleration to get velocity and dislacement
 for i=1:size(IO,2)
 %%%%%%%%频域法    
 %    iD_th=fft(IO(:,i));
@@ -86,7 +86,7 @@ NS=[D_th(:,2:8),V_th(:,2:8)];
 M=DRepos.M; 
 K=DRepos.K; 
 % C=DRepos.C;
-C=0.5*2*sqrtm(M'*K);
+C=0.05*2*sqrtm(M'*K);
 D=[DRepos.juzhen;DRepos.juzhen]; 
 
 %% EKF construction
@@ -98,10 +98,9 @@ B=(Phi^-1)*(eye(size(Phi))-expm((-1)*Phi*DeltaT))*Psi;
 
 StateFcn=@(X,U)(A*X+B*U);
 MeasurementFcn=@(Y) D*Y;
-obj = extendedKalmanFilter(StateFcn,MeasurementFcn,zeros(size(A,2),1),'StateCovariance',1.5e-6);
-obj.MeasurementNoise=0.1*mean(std(IO)')/size(IO,2);
-obj.ProcessNoise=mean(std(IO)')/size(IO,2);
-
+obj = extendedKalmanFilter(StateFcn,MeasurementFcn,zeros(size(A,2),1),'StateCovariance',mean(std(IO)')/size(IO,2));
+obj.MeasurementNoise=mean(std(IO)')/size(IO,2);
+obj.ProcessNoise=0.1*mean(std(IO)')/size(IO,2);
 
 h=waitbar(0,'Working');
 tic;
@@ -116,23 +115,16 @@ h.delete;
 % FS=PC(FS);
 
 %% PSD of the filtered signal
-[PsdT_1,f0]=pwelch(D_th(:,2),[],[],[],SplFreqcy);%Hamming窗，默认窗长度、重叠长度和DFT点数
-[PsdN_1,f1]=pwelch(NS(:,1),[],[],[],SplFreqcy);%Hamming窗，默认窗长度、重叠长度和DFT点数
-[PsdF_1,f2]=pwelch(FS(:,1),[],[],[],SplFreqcy);%Hamming窗，默认窗长度、重叠长度和DFT点数
-% PsdT_1(1)=0;
-% PsdF_1(1)=0;
+[PsdT,f0]=pwelch(D_th(:,3),[],[],[],SplFreqcy);%Hamming窗，默认窗长度、重叠长度和DFT点数
+[PsdN,f1]=pwelch(NS(:,2),[],[],[],SplFreqcy);%Hamming窗，默认窗长度、重叠长度和DFT点数
+[PsdF,f2]=pwelch(FS(:,2),[],[],[],SplFreqcy);%Hamming窗，默认窗长度、重叠长度和DFT点数
 
 %% Output
 figure(1)
-subplot(2,2,[1,2]);
-for i=1:8
-    plot3(t,i*ones(size(t,1),1),D_th(:,i));hold on;
-end
-    
-subplot(2,2,3);
-plot(t,D_th(:,2)); hold on;
-plot(t,NS(:,1)+max(NS(:,1)+max(D_th(:,1)))); 
-plot(t,FS(:,1)+max(FS(:,1)+max(NS(:,1))+max(D_th(:,1)))); 
+subplot(2,2,1);
+plot(t,D_th(:,3)); hold on;
+plot(t,NS(:,2)+max(NS(:,2)+max(D_th(:,3)))); 
+plot(t,FS(:,2)+max(FS(:,2)+max(NS(:,2))+max(D_th(:,3)))); 
 legend('\fontname{宋体}预处理后原纪录\fontname{Times new Roman}(D-th)','SVD\fontname{宋体}分解重构\fontname{Times new Roman}(NS)','EKF\fontname{宋体}滤波后\fontname{Times new Roman}(FS)','Location','best');
 xlabel('\fontname{宋体}时间\fontname{Times new Roman}(s)','FontSize',10);
 ylabel('\fontname{宋体}变形\fontname{Times new Roman}(m)','FontSize',10);
@@ -140,15 +132,20 @@ ylabel('\fontname{宋体}变形\fontname{Times new Roman}(m)','FontSize',10);
 % set(gcf,'Units','centimeters','Position',[0 0 16 16],'Resize','off');
 % RFile='C:\Users\pengbin\Desktop\T';
 % print('-f1',RFile,'-painters','-dmeta','-r600');
-subplot(2,2,4);
-[pks0,loc0]=max(PsdT_1);BscFreq0=f0(loc0);
-[pks1,loc1]=max(PsdN_1);BscFreq1=f1(loc1);
-[pks2,loc2]=max(PsdF_1);BscFreq2=f2(loc2);
-plot(f0,PsdT_1);hold on;
-plot(f1,PsdN_1);hold on;
-plot(f2,PsdF_1);hold on;
+
+subplot(2,2,2);
+[pks0,loc0]=max(PsdT(2:end));BscFreq0=f0(loc0+1);
+[pks1,loc1]=max(PsdN(2:end));BscFreq1=f1(loc1+1);
+[pks2,loc2]=max(PsdF(2:end));BscFreq2=f2(loc2+1);
+plot(f0,PsdT);hold on;
+plot(f1,PsdN);hold on;
+plot(f2,PsdF);hold on;
 legend(['PSD of D-th (Hz)',' ',num2str(BscFreq0,'%.1f')],['PSD of NS (Hz)',' ',num2str(BscFreq1,'%.1f')],['PSD of FS (Hz)',' ',num2str(BscFreq2,'%.1f')],'Location','best');
 
+subplot(2,2,[3,4]);
+for i=1:8
+    plot3(t,i*ones(size(t,1),1),D_th(:,i));hold on;
+end
 %% functions
 function Q=PC(P)
 [U1,e1,V1] = svd(P(:,1:7),0);
