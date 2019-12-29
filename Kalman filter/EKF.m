@@ -85,8 +85,7 @@ NS=[D_th(:,2:8),V_th(:,2:8)];
 %% Preparation of structural matricies
 M=DRepos.M; 
 K=DRepos.K; 
-% C=DRepos.C;
-C=0.05*2*sqrtm(M'*K);
+C=0.05*2*sqrtm(M'*K);% 或 C=DRepos.C;
 D=[DRepos.juzhen;DRepos.juzhen]; 
 
 %% EKF construction
@@ -98,9 +97,9 @@ B=(Phi^-1)*(eye(size(Phi))-expm((-1)*Phi*DeltaT))*Psi;
 
 StateFcn=@(X,U)(A*X+B*U);
 MeasurementFcn=@(Y) D*Y;
-obj = extendedKalmanFilter(StateFcn,MeasurementFcn,zeros(size(A,2),1),'StateCovariance',mean(std(IO)')/size(IO,2));
-obj.MeasurementNoise=mean(std(IO)')/size(IO,2);
-obj.ProcessNoise=0.1*mean(std(IO)')/size(IO,2);
+obj = extendedKalmanFilter(StateFcn,MeasurementFcn,zeros(size(A,2),1),'StateCovariance',(mean(std(IO)')/size(IO,2))^2);
+obj.MeasurementNoise=(mean(std(IO)')/size(IO,2))^2;
+obj.ProcessNoise=(0.1*mean(std(IO)')/size(IO,2))^2;
 
 h=waitbar(0,'Working');
 tic;
@@ -115,40 +114,32 @@ h.delete;
 % FS=PC(FS);
 
 %% PSD of the filtered signal
-CNo=2;
-[PsdT,f0]=pwelch(D_th(:,CNo),[],[],[],SplFreqcy);%Hamming窗，默认窗长度、重叠长度和DFT点数
+ChnlNo=1;
+[PsdT,f0]=pwelch(D_th(:,ChnlNo),[],[],[],SplFreqcy);%Hamming窗，默认窗长度、重叠长度和DFT点数
 % [PsdN,f1]=pwelch(NS(:,CNo),[],[],[],SplFreqcy);%Hamming窗，默认窗长度、重叠长度和DFT点数
-[PsdF,f2]=pwelch(FS(:,CNo),[],[],[],SplFreqcy);%Hamming窗，默认窗长度、重叠长度和DFT点数
+[PsdF,f2]=pwelch(FS(:,ChnlNo),[],[],[],SplFreqcy);%Hamming窗，默认窗长度、重叠长度和DFT点数
 
 %% Output
 figure(1)
 set(gcf,'Units','centimeters','Position',[0 0 30 16],'Resize','off');
 subplot(2,3,1);
-plot(t,IO(:,CNo+1));
+plot(t,IO(:,ChnlNo+1));
 legend('\fontname{宋体}预处理后原纪录\fontname{Times new Roman}(IO)','Location','best');
 xlabel('\fontname{宋体}时间\fontname{Times new Roman}(s)','FontSize',10);
 ylabel('\fontname{宋体}加速度\fontname{Times new Roman}(m^2/s)','FontSize',10);
-% set(gca,'FontName','Times new Roman','FontSize',11);m
-% set(gcf,'Units','centimeters','Position',[0 0 16 16],'Resize','off');
-% RFile='C:\Users\pengbin\Desktop\T';
-% print('-f1',RFile,'-painters','-dmeta','-r600');
 
 subplot(2,3,2);
-plot(t,V_th(:,CNo+1)); hold on;
+plot(t,V_th(:,ChnlNo+1)); hold on;
 % plot(t,NS(:,CNo+7)); 
-plot(t,FS(:,CNo+7)); 
+plot(t,FS(:,ChnlNo+7)); 
 legend('\fontname{宋体}预处理后原纪录\fontname{Times new Roman}(V-th)','EKF\fontname{宋体}滤波后\fontname{Times new Roman}(FS)','Location','best');
 xlabel('\fontname{宋体}时间\fontname{Times new Roman}(s)','FontSize',10);
 ylabel('\fontname{宋体}速度\fontname{Times new Roman}(m/s)','FontSize',10);
-% set(gca,'FontName','Times new Roman','FontSize',11);m
-% set(gcf,'Units','centimeters','Position',[0 0 16 16],'Resize','off');
-% RFile='C:\Users\pengbin\Desktop\T';
-% print('-f1',RFile,'-painters','-dmeta','-r600');
 
 subplot(2,3,3);
-plot(t,D_th(:,CNo+1)); hold on;
+plot(t,D_th(:,ChnlNo+1)); hold on;
 % plot(t,NS(:,CNo)); 
-plot(t,FS(:,CNo)); 
+plot(t,FS(:,ChnlNo)); 
 legend('\fontname{宋体}预处理后原纪录\fontname{Times new Roman}(D-th)','EKF\fontname{宋体}滤波后\fontname{Times new Roman}(FS)','Location','best');
 xlabel('\fontname{宋体}时间\fontname{Times new Roman}(s)','FontSize',10);
 ylabel('\fontname{宋体}变形\fontname{Times new Roman}(m)','FontSize',10);
@@ -168,7 +159,7 @@ legend(['PSD of D-th (Hz)',' ',num2str(BscFreq0,'%.1f')],['PSD of FS (Hz)',' ',n
 
 subplot(2,3,[5,6]);
 for i=1:8
-    plot3(t,i*ones(size(t,1),1),D_th(:,i));hold on;
+    plot3(t,(i-1)*ones(size(t,1),1),D_th(:,i));hold on;
     xlabel('\fontname{宋体}时间\fontname{Times new Roman}(s)','FontSize',10);
     ylabel('\fontname{宋体}通道','FontSize',10);
     zlabel('\fontname{宋体}变形\fontname{Times new Roman}(m)','FontSize',10);
