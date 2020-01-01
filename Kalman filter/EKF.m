@@ -1,7 +1,7 @@
 clear all;clc;close all;
-%%Preparation of the ambinet test data.IO is the detrended&truncated original signal, NS is SVDed signal, FS is EKFed signal
+%%Preparation of the ambinet test data.IO is the detrended&truncated acceleration signal, NS is the velocity and deformation integrated from the IO,FS is EKFed from the NS
 % Read data  
-ImDataFile='C:\Users\pengbin\OneDrive - usst.edu.cn\桌面\Publication\振动与冲击\walldataT\W1T_data.mat';
+ImDataFile='C:\Users\Bin Peng\OneDrive - usst.edu.cn\桌面\Publication\振动与冲击\walldataT\W1T_data.mat';
 DRepos=importdata(ImDataFile);
 Fst=1;Lnth=4095;Lst=Fst+Lnth;SclFtr=0.01;
 IOA=[DRepos.A_input1T(Fst:Lst),DRepos.A_output1T(Fst:Lst),DRepos.A_output2T(Fst:Lst),DRepos.A_output3T(Fst:Lst),DRepos.A_output4T(Fst:Lst),DRepos.A_output5T(Fst:Lst),DRepos.A_output6T(Fst:Lst),DRepos.A_output7T(Fst:Lst)];
@@ -84,8 +84,8 @@ NS=[D_th(:,2:8),V_th(:,2:8)];
 
 %% Preparation of structural matricies
 M=DRepos.M; 
-K=DRepos.K; 
-C=0.05*2*sqrtm(M'*K);% 或 C=DRepos.C;
+K=1.75*DRepos.K; 
+C=0.053*2*sqrtm(M'*K);% 或 C=DRepos.C;
 D=[DRepos.juzhen;DRepos.juzhen]; 
 
 %% EKF construction
@@ -99,7 +99,7 @@ StateFcn=@(X,U)(A*X+B*U);
 MeasurementFcn=@(Y) D*Y;
 obj = extendedKalmanFilter(StateFcn,MeasurementFcn,zeros(size(A,2),1),'StateCovariance',(mean(std(IO)')/size(IO,2))^2);
 obj.MeasurementNoise=(mean(std(IO)')/size(IO,2))^2;
-obj.ProcessNoise=(0.1*mean(std(IO)')/size(IO,2))^2;
+obj.ProcessNoise=0.1*(mean(std(IO)')/size(IO,2))^2;
 
 h=waitbar(0,'Working');
 tic;
@@ -115,7 +115,7 @@ h.delete;
 
 %% PSD of the filtered signal
 ChnlNo=1;
-[PsdT,f0]=pwelch(D_th(:,ChnlNo),[],[],[],SplFreqcy);%Hamming窗，默认窗长度、重叠长度和DFT点数
+[PsdN,f0]=pwelch(NS(:,ChnlNo),[],[],[],SplFreqcy);%Hamming窗，默认窗长度、重叠长度和DFT点数
 % [PsdN,f1]=pwelch(NS(:,CNo),[],[],[],SplFreqcy);%Hamming窗，默认窗长度、重叠长度和DFT点数
 [PsdF,f2]=pwelch(FS(:,ChnlNo),[],[],[],SplFreqcy);%Hamming窗，默认窗长度、重叠长度和DFT点数
 
@@ -129,7 +129,7 @@ xlabel('\fontname{宋体}时间\fontname{Times new Roman}(s)','FontSize',10);
 ylabel('\fontname{宋体}加速度\fontname{Times new Roman}(m^2/s)','FontSize',10);
 
 subplot(2,3,2);
-plot(t,V_th(:,ChnlNo+1)); hold on;
+plot(t,NS(:,ChnlNo+7)); hold on;
 % plot(t,NS(:,CNo+7)); 
 plot(t,FS(:,ChnlNo+7)); 
 legend('\fontname{宋体}预处理后原纪录\fontname{Times new Roman}(V-th)','EKF\fontname{宋体}滤波后\fontname{Times new Roman}(FS)','Location','best');
@@ -137,7 +137,7 @@ xlabel('\fontname{宋体}时间\fontname{Times new Roman}(s)','FontSize',10);
 ylabel('\fontname{宋体}速度\fontname{Times new Roman}(m/s)','FontSize',10);
 
 subplot(2,3,3);
-plot(t,D_th(:,ChnlNo+1)); hold on;
+plot(t,NS(:,ChnlNo)); hold on;
 % plot(t,NS(:,CNo)); 
 plot(t,FS(:,ChnlNo)); 
 legend('\fontname{宋体}预处理后原纪录\fontname{Times new Roman}(D-th)','EKF\fontname{宋体}滤波后\fontname{Times new Roman}(FS)','Location','best');
@@ -149,10 +149,10 @@ ylabel('\fontname{宋体}变形\fontname{Times new Roman}(m)','FontSize',10);
 % print('-f1',RFile,'-painters','-dmeta','-r600');
 
 subplot(2,3,4);
-[pks0,loc0]=max(PsdT(2:end));BscFreq0=f0(loc0+1);
+[pks0,loc0]=max(PsdN(2:end));BscFreq0=f0(loc0+1);
 % [pks1,loc1]=max(PsdN(2:end));BscFreq1=f1(loc1+1);
 [pks2,loc2]=max(PsdF(2:end));BscFreq2=f2(loc2+1);
-plot(f0,PsdT);hold on;
+plot(f0,PsdN);hold on;
 % plot(f1,PsdN);hold on;
 plot(f2,PsdF);hold on;
 legend(['PSD of D-th (Hz)',' ',num2str(BscFreq0,'%.1f')],['PSD of FS (Hz)',' ',num2str(BscFreq2,'%.1f')],'Location','best');
