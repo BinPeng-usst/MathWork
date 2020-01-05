@@ -1,7 +1,7 @@
 %% data prepare
 clear all;
 
-DataFile='C:\Users\Bin Peng\OneDrive\建筑结构学报\Draft';   
+DataFile='C:\Users\Bin Peng\OneDrive - usst.edu.cn\桌面\Publication\建筑结构学报（赵文昊）\Draft';   
 CollectI1=xlsread(DataFile,'collected results (1)','B2:C40');
 CollectI2=xlsread(DataFile,'collected results (2)','K2:L14');
 TestI1=xlsread(DataFile,'Test results','B2:C7');
@@ -197,95 +197,95 @@ code135=(fv+0.64*(0.23-0.065*(1.35)*cs(:,2)./f).*cs(:,2)*(1.35))/(0.42);
 % % ylabel('\fontname{宋体}实验结果\fontname{Times new Roman}(N/mm^{2})','FontSize',10);
 % set(gcf,'units','centimeters','position',[1 1 23 12.5/2]);    
      %% 预测结果
-% figure (1)
-% subplot(2,2,1)
-%     yM1= 0.8723*xs(:,1)+0.4146*xs(:,2);
-%     plot([1:1:size(yM1)]',yM1,'k-.*','markersize',6); 
-%     hold on;
-%     plot([1:1:size(ypred1)]',ypred1,'r-^','linewidth',1.5,'markersize',5); 
-%     hold on;
-%     scatter([1:size(rs,1)-6]',rs(1:size(rs,1)-6),60,'MarkerEdgeColor','b');
-%     hold on;
-%     scatter([size(rs,1)-5:size(rs,1)]',rs(size(rs,1)-5:size(rs,1)),60,'filled','MarkerFaceColor','b');
-%     hold on;
-%     f = [ypred1+ysd1; flipdim(ypred1-ysd1,1)];
-%     fill([[1:1:size(ypred1)]'; flipdim([1:1:size(ypred1)]',1)], f, 'g','FaceAlpha',0.3,'EdgeColor','g','EdgeAlpha',0.5);
-%     set(gca,'FontName','Times new Roman','FontSize',16,'xlim',[0 (size(ypred2,1))],'xtick',[0:1:(size(ypred2,1))],'ylim',[0,1.8],'ytick',[0:0.3:1.8]);
-%     box off;
-% 
-% subplot(2,2,2)
-%     yM2=0.2809*xs(:,1).*sqrt(1+20.93*xs(:,2)./xs(:,1));
-%     plot([1:1:size(yM2)]',yM2,'k-.*','markersize',6); 
-%     hold on;
-%     plot([1:1:size(ypred2)]',ypred2,'r-^','linewidth',1.5,'markersize',5); 
-%     hold on;
-%     scatter([1:size(rs,1)-6]',rs(1:size(rs,1)-6),60,'MarkerEdgeColor','b');
-%     hold on;
-%     scatter([size(rs,1)-5:size(rs,1)]',rs(size(rs,1)-5:size(rs,1)),60,'filled','MarkerFaceColor','b');
-%     hold on;
-%     f = [ypred2+ysd2; flipdim(ypred2-ysd2,1)];
-%     fill([[1:1:size(ypred2)]'; flipdim([1:1:size(ypred2)]',1)], f, 'g','FaceAlpha',0.3,'EdgeColor','g','EdgeAlpha',0.5);
-%     set(gca,'FontName','Times new Roman','FontSize',16,'xlim',[0 (size(ypred2,1))],'xtick',[0:1:(size(ypred2,1))],'ylim',[0,1.8],'ytick',[0:0.3:1.8]);
-%     box off;
-%  
-% subplot(2,2,3);
-%     yM3=0.1818+0.3875*xs(:,2);
-%     plot([1:1:size(yM3)]',yM3,'k-.*','markersize',6); 
-%     hold on;
-%     plot([1:1:size(ypred3)]',ypred3,'r-^','linewidth',1.5,'markersize',5); 
-%     hold on;
-%     scatter([1:size(rs,1)-6]',rs(1:size(rs,1)-6),60,'MarkerEdgeColor','b');
-%     hold on;
-%     scatter([size(rs,1)-5:size(rs,1)]',rs(size(rs,1)-5:size(rs,1)),60,'filled','MarkerFaceColor','b');
-%     hold on;
-%     f = [ypred3+ysd3; flipdim(ypred3-ysd3,1)];
-%     fill([[1:1:size(ypred3)]'; flipdim([1:1:size(ypred3)]',1)], f, 'g','FaceAlpha',0.3,'EdgeColor','g','EdgeAlpha',0.5);
-%     set(gca,'FontName','Times new Roman','FontSize',16,'xlim',[0 (size(ypred3,1))],'xtick',[0:1:(size(ypred3,1))],'ylim',[0,1.8],'ytick',[0:0.3:1.8]);
-%     box off;
-% 
-% subplot(2,2,4);
-%     plot([1:1:size(ypred4)]',ypred4,'r-^','linewidth',1.5,'markersize',5); 
-%     hold on;
-%     scatter([1:size(rs,1)-6]',rs(1:size(rs,1)-6),60,'MarkerEdgeColor','b');
-%     hold on;
-%     scatter([size(rs,1)-5:size(rs,1)]',rs(size(rs,1)-5:size(rs,1)),60,'filled','MarkerFaceColor','b');
-%     hold on;
-%     f = [ypred4+ysd4; flipdim(ypred4-ysd4,1)];
-%     fill([[1:1:size(ypred4)]'; flipdim([1:1:size(ypred4)]',1)], f, 'g','FaceAlpha',0.3,'EdgeColor','g','EdgeAlpha',0.5);
-%     set(gca,'FontName','Times new Roman','FontSize',16,'xlim',[0 (size(ypred4,1))],'xtick',[0:1:(size(ypred4,1))],'ylim',[0,1.8],'ytick',[0:0.3:1.8]);
-%     box off;
-% % xlabel('墙体编号','FontName','{宋体}','FontSize',10);
-% % ylabel('\fontname{宋体}名义抗剪强度\fontname{Times new Roman}{\it\bf\tau} (N/mm^{2})');
-% % L1=legend('\fontname{宋体}本文模型推断','\fontname{宋体}文献实验结果','\fontname{宋体}本文实验结果',,'Location','Best');
-% % set(L1,'FontSize',15,'Box','off');
-% box off;
-% set(gcf,'units','normalized','position',[0.1 0.1 0.9 0.9]);
-  %% 玫瑰图
-figure(1);
-DeltaT=T-rs;
-MSET=(sum(DeltaT.^2)/size(DeltaT,1))/var(rs);
-MaxT=max(abs(DeltaT));
-MinT=min(abs(DeltaT));
-s1=size(T,1);
-s2=size(CollectO2([9:13]),1);
-s3=size(TestO1,1);
-delta=2*pi/s1;
-polarplot([0:delta:(2*pi-delta)],T,'r-^','linewidth',1.5,'markersize',5);
-hold on;
-polarplot([0:delta:(2*pi-delta)],code12,'k--');
-hold on;
-polarplot([0:delta:(2*pi-delta)],code135,'k--');
-hold on;
-polarscatter([0:delta:(s2-1)*delta]',CollectO2([9:13]),45,'MarkerEdgeColor','b');
-hold on;
-polarscatter([s2*delta:delta:(2*pi-delta)]',TestO1,45,'filled','MarkerFaceColor','b');
-hold on;
-TTick=[0:rad2deg(delta):rad2deg(2*pi-delta)];
-TLable={'\fontname{宋体}墙体1';'2';'3';'4';'\fontname{宋体}墙体5';'6';'7';'8';'\fontname{宋体}墙体9';'10';'11';'12';'\fontname{宋体}墙体13';'14';'15';'16'};
-% L1=legend('','','','Location','Best');
+figure (1)
+subplot(2,2,1)
+    yM1= 0.8723*xs(:,1)+0.4146*xs(:,2);
+    plot([1:1:size(yM1)]',yM1,'k-.*','markersize',6); 
+    hold on;
+    plot([1:1:size(ypred1)]',ypred1,'r-^','linewidth',1.5,'markersize',5); 
+    hold on;
+    scatter([1:size(rs,1)-6]',rs(1:size(rs,1)-6),60,'MarkerEdgeColor','b');
+    hold on;
+    scatter([size(rs,1)-5:size(rs,1)]',rs(size(rs,1)-5:size(rs,1)),60,'filled','MarkerFaceColor','b');
+    hold on;
+    f = [ypred1+ysd1; flipdim(ypred1-ysd1,1)];
+    fill([[1:1:size(ypred1)]'; flipdim([1:1:size(ypred1)]',1)], f, 'g','FaceAlpha',0.3,'EdgeColor','g','EdgeAlpha',0.5);
+    set(gca,'FontName','Times new Roman','FontSize',16,'xlim',[0 (size(ypred2,1))],'xtick',[0:1:(size(ypred2,1))],'ylim',[0,1.8],'ytick',[0:0.3:1.8]);
+    box off;
+
+subplot(2,2,2)
+    yM2=0.2809*xs(:,1).*sqrt(1+20.93*xs(:,2)./xs(:,1));
+    plot([1:1:size(yM2)]',yM2,'k-.*','markersize',6); 
+    hold on;
+    plot([1:1:size(ypred2)]',ypred2,'r-^','linewidth',1.5,'markersize',5); 
+    hold on;
+    scatter([1:size(rs,1)-6]',rs(1:size(rs,1)-6),60,'MarkerEdgeColor','b');
+    hold on;
+    scatter([size(rs,1)-5:size(rs,1)]',rs(size(rs,1)-5:size(rs,1)),60,'filled','MarkerFaceColor','b');
+    hold on;
+    f = [ypred2+ysd2; flipdim(ypred2-ysd2,1)];
+    fill([[1:1:size(ypred2)]'; flipdim([1:1:size(ypred2)]',1)], f, 'g','FaceAlpha',0.3,'EdgeColor','g','EdgeAlpha',0.5);
+    set(gca,'FontName','Times new Roman','FontSize',16,'xlim',[0 (size(ypred2,1))],'xtick',[0:1:(size(ypred2,1))],'ylim',[0,1.8],'ytick',[0:0.3:1.8]);
+    box off;
+ 
+subplot(2,2,3);
+    yM3=0.1818+0.3875*xs(:,2);
+    plot([1:1:size(yM3)]',yM3,'k-.*','markersize',6); 
+    hold on;
+    plot([1:1:size(ypred3)]',ypred3,'r-^','linewidth',1.5,'markersize',5); 
+    hold on;
+    scatter([1:size(rs,1)-6]',rs(1:size(rs,1)-6),60,'MarkerEdgeColor','b');
+    hold on;
+    scatter([size(rs,1)-5:size(rs,1)]',rs(size(rs,1)-5:size(rs,1)),60,'filled','MarkerFaceColor','b');
+    hold on;
+    f = [ypred3+ysd3; flipdim(ypred3-ysd3,1)];
+    fill([[1:1:size(ypred3)]'; flipdim([1:1:size(ypred3)]',1)], f, 'g','FaceAlpha',0.3,'EdgeColor','g','EdgeAlpha',0.5);
+    set(gca,'FontName','Times new Roman','FontSize',16,'xlim',[0 (size(ypred3,1))],'xtick',[0:1:(size(ypred3,1))],'ylim',[0,1.8],'ytick',[0:0.3:1.8]);
+    box off;
+
+subplot(2,2,4);
+    plot([1:1:size(ypred4)]',ypred4,'r-^','linewidth',1.5,'markersize',5); 
+    hold on;
+    scatter([1:size(rs,1)-6]',rs(1:size(rs,1)-6),60,'MarkerEdgeColor','b');
+    hold on;
+    scatter([size(rs,1)-5:size(rs,1)]',rs(size(rs,1)-5:size(rs,1)),60,'filled','MarkerFaceColor','b');
+    hold on;
+    f = [ypred4+ysd4; flipdim(ypred4-ysd4,1)];
+    fill([[1:1:size(ypred4)]'; flipdim([1:1:size(ypred4)]',1)], f, 'g','FaceAlpha',0.3,'EdgeColor','g','EdgeAlpha',0.5);
+    set(gca,'FontName','Times new Roman','FontSize',16,'xlim',[0 (size(ypred4,1))],'xtick',[0:1:(size(ypred4,1))],'ylim',[0,1.8],'ytick',[0:0.3:1.8]);
+    box off;
+% xlabel('墙体编号','FontName','{宋体}','FontSize',10);
+% ylabel('\fontname{宋体}名义抗剪强度\fontname{Times new Roman}{\it\bf\tau} (N/mm^{2})');
+% L1=legend('\fontname{宋体}本文模型推断','\fontname{宋体}文献实验结果','\fontname{宋体}本文实验结果',,'Location','Best');
 % set(L1,'FontSize',15,'Box','off');
-set(gca,'FontName','Times new Roman','FontSize',9,'ThetaTick',TTick,'ThetaTickLabel',TLable,'Rlim',[0,1.5],'Rtick',[0:0.3:1.5],'RAxisLocation',45,'RTickLabel',{});
-set(gcf,'units','centimeters','position',[1 1 8.5 8.5]); 
+box off;
+set(gcf,'units','normalized','position',[0.1 0.1 0.9 0.9]);
+  %% 玫瑰图
+% figure(1);
+% DeltaT=T-rs;
+% MSET=(sum(DeltaT.^2)/size(DeltaT,1))/var(rs);
+% MaxT=max(abs(DeltaT));
+% MinT=min(abs(DeltaT));
+% s1=size(T,1);
+% s2=size(CollectO2([9:13]),1);
+% s3=size(TestO1,1);
+% delta=2*pi/s1;
+% polarplot([0:delta:(2*pi-delta)],T,'r-^','linewidth',1.5,'markersize',5);
+% hold on;
+% polarplot([0:delta:(2*pi-delta)],code12,'k--');
+% hold on;
+% polarplot([0:delta:(2*pi-delta)],code135,'k--');
+% hold on;
+% polarscatter([0:delta:(s2-1)*delta]',CollectO2([9:13]),45,'MarkerEdgeColor','b');
+% hold on;
+% polarscatter([s2*delta:delta:(2*pi-delta)]',TestO1,45,'filled','MarkerFaceColor','b');
+% hold on;
+% TTick=[0:rad2deg(delta):rad2deg(2*pi-delta)];
+% TLable={'\fontname{宋体}墙体1';'2';'3';'4';'\fontname{宋体}墙体5';'6';'7';'8';'\fontname{宋体}墙体9';'10';'11';'12';'\fontname{宋体}墙体13';'14';'15';'16'};
+% % L1=legend('','','','Location','Best');
+% % set(L1,'FontSize',15,'Box','off');
+% set(gca,'FontName','Times new Roman','FontSize',9,'ThetaTick',TTick,'ThetaTickLabel',TLable,'Rlim',[0,1.5],'Rtick',[0:0.3:1.5],'RAxisLocation',45,'RTickLabel',{});
+% set(gcf,'units','centimeters','position',[1 1 8.5 8.5]); 
 %% plot 3-D
   %% 管状图;
 %    figure(1)
