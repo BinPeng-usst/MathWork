@@ -84,8 +84,8 @@ NS=[D_th(:,2:8),V_th(:,2:8)];
 
 %% Preparation of structural matricies
 M=DRepos.M; 
-K=1.75*DRepos.K; 
-C=0.053*2*sqrtm(M'*K);% ªÚ C=DRepos.C;
+K=DRepos.K1; 
+C=DRepos.C1;% ªÚC=0.053*2*sqrtm(M'*K); 
 D=[DRepos.juzhen;DRepos.juzhen]; 
 
 %% EKF construction
