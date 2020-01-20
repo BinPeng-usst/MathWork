@@ -1,7 +1,7 @@
 clear all;clc;close all;
 %%Preparation of the ambinet test data.IO is the detrended&truncated acceleration signal, NS is the velocity and deformation integrated from the IO,FS is EKFed from the NS
 % Read data  
-ImDataFile='C:\Users\pengbin\OneDrive - usst.edu.cn\桌面\Publication\振动与冲击\试验数据\动测\W1T.mat';
+ImDataFile='C:\Users\pengbin\OneDrive - usst.edu.cn\桌面\Publication\振动与冲击\试验数据\动测\动测结果\W1T_data.mat';
 [fpath,fname,fsuffix]=fileparts(ImDataFile);
 DRepos=importdata(ImDataFile);
 Fst=1;Lnth=8191;Lst=Fst+Lnth;SclFtr=0.01;
