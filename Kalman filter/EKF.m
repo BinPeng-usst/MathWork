@@ -1,17 +1,47 @@
 clear all;clc;close all;
 %%Preparation of the ambinet test data.IO is the detrended&truncated acceleration signal, NS is the velocity and deformation integrated from the IO,FS is EKFed from the NS
-% Read data  
-ImDataFile='C:\Users\pengbin\OneDrive - usst.edu.cn\桌面\Publication\振动与冲击\试验数据\动测\动测结果\W1T_data.mat';
+% % Read data by UI
+% [FileName,PathName] = uigetfile('*.mat','Select the MATLAB code file');
+% ImDataFile=[PathName,FileName];
+% [fpath,fname,fsuffix]=fileparts(ImDataFile);
+% prompt = {'Enter the state:','Enter the channel no.:'};
+% dlg_title = 'Input';
+% num_lines = 1;
+% answer = inputdlg(prompt,dlg_title,num_lines);
+% DRepos=importdata(ImDataFile);
+% Fst=1;Lnth=8191;Lst=Fst+Lnth;SclFtr=0.01;
+% IOA=[DRepos.A_input1T(Fst:Lst),DRepos.A_output1T(Fst:Lst),DRepos.A_output2T(Fst:Lst),DRepos.A_output3T(Fst:Lst),DRepos.A_output4T(Fst:Lst),DRepos.A_output5T(Fst:Lst),DRepos.A_output6T(Fst:Lst),DRepos.A_output7T(Fst:Lst)];
+% IOB=[DRepos.B_input1T(Fst:Lst),DRepos.B_output1T(Fst:Lst),DRepos.B_output2T(Fst:Lst),DRepos.B_output3T(Fst:Lst),DRepos.B_output4T(Fst:Lst),DRepos.B_output5T(Fst:Lst),DRepos.B_output6T(Fst:Lst),DRepos.B_output7T(Fst:Lst)];
+% IO1=[DRepos.C_input1T(Fst:Lst),DRepos.C_output1T(Fst:Lst),DRepos.C_output2T(Fst:Lst),DRepos.C_output3T(Fst:Lst),DRepos.C_output4T(Fst:Lst),DRepos.C_output5T(Fst:Lst),DRepos.C_output6T(Fst:Lst),DRepos.C_output7T(Fst:Lst)];
+% IO2=[DRepos.D_input1T(Fst:Lst),DRepos.D_output1T(Fst:Lst),DRepos.D_output2T(Fst:Lst),DRepos.D_output3T(Fst:Lst),DRepos.D_output4T(Fst:Lst),DRepos.D_output5T(Fst:Lst),DRepos.D_output6T(Fst:Lst),DRepos.D_output7T(Fst:Lst)];
+% IO3=[DRepos.E_input1T(Fst:Lst),DRepos.E_output1T(Fst:Lst),DRepos.E_output2T(Fst:Lst),DRepos.E_output3T(Fst:Lst),DRepos.E_output4T(Fst:Lst),DRepos.E_output5T(Fst:Lst),DRepos.E_output6T(Fst:Lst),DRepos.E_output7T(Fst:Lst)];
+% switch answer{1,1}
+%     case 'A'
+%         WState=IOA;State=SName(IOA);
+%     case 'B'
+%         WState=IOB;State=SName(IOB);
+%     case '1'
+%         WState=IO1;State=SName(IO1);
+%     case '2'
+%         WState=IO2;State=SName(IO2); 
+%     case '3'
+%         WState=IO3;State=SName(IO3);
+% end
+% ChnlNo=str2num(answer{2,1});
+% IO=WState*SclFtr;
+
+% Read data directly
+ImDataFile='C:\Users\Bin Peng\OneDrive - usst.edu.cn\桌面\Publication\振动与冲击\试验数据\动测\动测结果\W1T_data.mat';
 [fpath,fname,fsuffix]=fileparts(ImDataFile);
 DRepos=importdata(ImDataFile);
-Fst=1;Lnth=8191;Lst=Fst+Lnth;SclFtr=0.01;
+Fst=1;Lnth=1023;Lst=Fst+Lnth;SclFtr=0.01;
 IOA=[DRepos.A_input1T(Fst:Lst),DRepos.A_output1T(Fst:Lst),DRepos.A_output2T(Fst:Lst),DRepos.A_output3T(Fst:Lst),DRepos.A_output4T(Fst:Lst),DRepos.A_output5T(Fst:Lst),DRepos.A_output6T(Fst:Lst),DRepos.A_output7T(Fst:Lst)];
 IOB=[DRepos.B_input1T(Fst:Lst),DRepos.B_output1T(Fst:Lst),DRepos.B_output2T(Fst:Lst),DRepos.B_output3T(Fst:Lst),DRepos.B_output4T(Fst:Lst),DRepos.B_output5T(Fst:Lst),DRepos.B_output6T(Fst:Lst),DRepos.B_output7T(Fst:Lst)];
 IO1=[DRepos.C_input1T(Fst:Lst),DRepos.C_output1T(Fst:Lst),DRepos.C_output2T(Fst:Lst),DRepos.C_output3T(Fst:Lst),DRepos.C_output4T(Fst:Lst),DRepos.C_output5T(Fst:Lst),DRepos.C_output6T(Fst:Lst),DRepos.C_output7T(Fst:Lst)];
 IO2=[DRepos.D_input1T(Fst:Lst),DRepos.D_output1T(Fst:Lst),DRepos.D_output2T(Fst:Lst),DRepos.D_output3T(Fst:Lst),DRepos.D_output4T(Fst:Lst),DRepos.D_output5T(Fst:Lst),DRepos.D_output6T(Fst:Lst),DRepos.D_output7T(Fst:Lst)];
 IO3=[DRepos.E_input1T(Fst:Lst),DRepos.E_output1T(Fst:Lst),DRepos.E_output2T(Fst:Lst),DRepos.E_output3T(Fst:Lst),DRepos.E_output4T(Fst:Lst),DRepos.E_output5T(Fst:Lst),DRepos.E_output6T(Fst:Lst),DRepos.E_output7T(Fst:Lst)];
 WState=IO2;State=SName(IO2);
-ChnlNo=4;
+ChnlNo=2;
 IO=WState*SclFtr;
 % Fst=1;Lnth=size(DRepos.A_input,1)-1;Lst=Fst+Lnth;SclFtr=0.01;
 % IOA=[DRepos.A_input(Fst:Lst),DRepos.A_output1(Fst:Lst),DRepos.A_output2(Fst:Lst),DRepos.A_output3(Fst:Lst),DRepos.A_output4(Fst:Lst),DRepos.A_output5(Fst:Lst),DRepos.A_output6(Fst:Lst),DRepos.A_output7(Fst:Lst)];
@@ -41,8 +71,8 @@ t=[0:1/SplFreqcy:(size(IO,1)-1)/SplFreqcy]';
 %% Detrend
 DtrdOdr=1;
 for i=1:size(IO,2)
-%     IO(:,i)=detrend(IO(:,i)-polyval(polyfit(t,IO(:,i),DtrdOdr),t));
-      IO(:,i)=detrend(IO(:,i));
+    IO(:,i)=detrend(IO(:,i)-polyval(polyfit(t,IO(:,i),DtrdOdr),t));
+%   IO(:,i)=IO(:,i)-mean(IO(:,i));
 end
 
 %% Delete small voltage turbulents
@@ -104,9 +134,9 @@ B=(Phi^-1)*(eye(size(Phi))-expm((-1)*Phi*DeltaT))*Psi;
 
 StateFcn=@(X,U)(A*X+B*U);
 MeasurementFcn=@(Y) D*Y;
-obj = extendedKalmanFilter(StateFcn,MeasurementFcn,zeros(size(A,2),1),'StateCovariance',(mean(std(IO)')/size(IO,2))^2);
+obj = extendedKalmanFilter(StateFcn,MeasurementFcn,zeros(size(A,2),1),'StateCovariance',2*(mean(std(IO)')/size(IO,2))^2);
 obj.MeasurementNoise=(mean(std(IO)')/size(IO,2))^2;
-obj.ProcessNoise=0.01*(mean(std(IO)')/size(IO,2))^2;
+obj.ProcessNoise=0.001*(mean(std(IO)')/size(IO,2))^2;
 
 h=waitbar(0,'Working');
 tic;
@@ -115,7 +145,7 @@ for k = 1:size(NS,1)
   [PredictedState,PredictedStateCovariance] = predict(obj,IO(k,1)*ones(size(B,2),1));
   FS(k,1:14)=(D*CorrectedState)';
   time=toc;hrs=floor(time/3600);mnts=floor(time/60);secs=mod(time,60);
-  waitbar(k/size(NS,1),h,num2str(k/size(NS,1),'%.1f')+"    "+num2str(hrs)+":"+num2str(mnts)+":"+num2str(secs,'%.1f'));
+  waitbar(k/size(NS,1),h,num2str(k*100/size(NS,1),'%.1f')+"%Completed"+"    "+"Time used: "+num2str(hrs,'%02.0f')+":"+num2str(mnts,'%02.0f')+":"+num2str(secs,'%.1f'));
 end
 h.delete;
 % FS=PC(FS);
