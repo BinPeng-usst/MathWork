@@ -31,34 +31,29 @@ clear all;clc;close all;
 % IO=WState*SclFtr;
 
 % Read data directly
-ImDataFile='C:\Users\Bin Peng\OneDrive - usst.edu.cn\桌面\Publication\振动与冲击\试验数据\动测\动测结果\W1T_data.mat';
+ImDataFile='C:\Users\Bin Peng\OneDrive - usst.edu.cn\桌面\Publication\振动与冲击\试验数据\动测\动测结果\W1_data.mat';
 [fpath,fname,fsuffix]=fileparts(ImDataFile);
 DRepos=importdata(ImDataFile);
-Fst=1;Lnth=1023;Lst=Fst+Lnth;SclFtr=0.01;
-IOA=[DRepos.A_input1T(Fst:Lst),DRepos.A_output1T(Fst:Lst),DRepos.A_output2T(Fst:Lst),DRepos.A_output3T(Fst:Lst),DRepos.A_output4T(Fst:Lst),DRepos.A_output5T(Fst:Lst),DRepos.A_output6T(Fst:Lst),DRepos.A_output7T(Fst:Lst)];
-IOB=[DRepos.B_input1T(Fst:Lst),DRepos.B_output1T(Fst:Lst),DRepos.B_output2T(Fst:Lst),DRepos.B_output3T(Fst:Lst),DRepos.B_output4T(Fst:Lst),DRepos.B_output5T(Fst:Lst),DRepos.B_output6T(Fst:Lst),DRepos.B_output7T(Fst:Lst)];
-IO1=[DRepos.C_input1T(Fst:Lst),DRepos.C_output1T(Fst:Lst),DRepos.C_output2T(Fst:Lst),DRepos.C_output3T(Fst:Lst),DRepos.C_output4T(Fst:Lst),DRepos.C_output5T(Fst:Lst),DRepos.C_output6T(Fst:Lst),DRepos.C_output7T(Fst:Lst)];
-IO2=[DRepos.D_input1T(Fst:Lst),DRepos.D_output1T(Fst:Lst),DRepos.D_output2T(Fst:Lst),DRepos.D_output3T(Fst:Lst),DRepos.D_output4T(Fst:Lst),DRepos.D_output5T(Fst:Lst),DRepos.D_output6T(Fst:Lst),DRepos.D_output7T(Fst:Lst)];
-IO3=[DRepos.E_input1T(Fst:Lst),DRepos.E_output1T(Fst:Lst),DRepos.E_output2T(Fst:Lst),DRepos.E_output3T(Fst:Lst),DRepos.E_output4T(Fst:Lst),DRepos.E_output5T(Fst:Lst),DRepos.E_output6T(Fst:Lst),DRepos.E_output7T(Fst:Lst)];
-WState=IO2;State=SName(IO2);
-ChnlNo=2;
+% Fst=1;Lnth=8191;Lst=Fst+Lnth;SclFtr=0.01;
+% IOA=[DRepos.A_input1T(Fst:Lst),DRepos.A_output1T(Fst:Lst),DRepos.A_output2T(Fst:Lst),DRepos.A_output3T(Fst:Lst),DRepos.A_output4T(Fst:Lst),DRepos.A_output5T(Fst:Lst),DRepos.A_output6T(Fst:Lst),DRepos.A_output7T(Fst:Lst)];
+% IOB=[DRepos.B_input1T(Fst:Lst),DRepos.B_output1T(Fst:Lst),DRepos.B_output2T(Fst:Lst),DRepos.B_output3T(Fst:Lst),DRepos.B_output4T(Fst:Lst),DRepos.B_output5T(Fst:Lst),DRepos.B_output6T(Fst:Lst),DRepos.B_output7T(Fst:Lst)];
+% IO1=[DRepos.C_input1T(Fst:Lst),DRepos.C_output1T(Fst:Lst),DRepos.C_output2T(Fst:Lst),DRepos.C_output3T(Fst:Lst),DRepos.C_output4T(Fst:Lst),DRepos.C_output5T(Fst:Lst),DRepos.C_output6T(Fst:Lst),DRepos.C_output7T(Fst:Lst)];
+% IO2=[DRepos.D_input1T(Fst:Lst),DRepos.D_output1T(Fst:Lst),DRepos.D_output2T(Fst:Lst),DRepos.D_output3T(Fst:Lst),DRepos.D_output4T(Fst:Lst),DRepos.D_output5T(Fst:Lst),DRepos.D_output6T(Fst:Lst),DRepos.D_output7T(Fst:Lst)];
+% IO3=[DRepos.E_input1T(Fst:Lst),DRepos.E_output1T(Fst:Lst),DRepos.E_output2T(Fst:Lst),DRepos.E_output3T(Fst:Lst),DRepos.E_output4T(Fst:Lst),DRepos.E_output5T(Fst:Lst),DRepos.E_output6T(Fst:Lst),DRepos.E_output7T(Fst:Lst)];
+Fst=1;Lnth=size(DRepos.A_input,1)-1;Lst=Fst+Lnth;SclFtr=0.01;
+IOA=[DRepos.A_input(Fst:Lst),DRepos.A_output1(Fst:Lst),DRepos.A_output2(Fst:Lst),DRepos.A_output3(Fst:Lst),DRepos.A_output4(Fst:Lst),DRepos.A_output5(Fst:Lst),DRepos.A_output6(Fst:Lst),DRepos.A_output7(Fst:Lst)];
+Fst=1;Lnth=size(DRepos.B_input,1)-1;Lst=Fst+Lnth;SclFtr=0.01;
+IOB=[DRepos.B_input(Fst:Lst),DRepos.B_output1(Fst:Lst),DRepos.B_output2(Fst:Lst),DRepos.B_output3(Fst:Lst),DRepos.B_output4(Fst:Lst),DRepos.B_output5(Fst:Lst),DRepos.B_output6(Fst:Lst),DRepos.B_output7(Fst:Lst)];
+Fst=1;Lnth=size(DRepos.C_input,1)-1;Lst=Fst+Lnth;SclFtr=0.01;
+IO1=[DRepos.C_input(Fst:Lst),DRepos.C_output1(Fst:Lst),DRepos.C_output2(Fst:Lst),DRepos.C_output3(Fst:Lst),DRepos.C_output4(Fst:Lst),DRepos.C_output5(Fst:Lst),DRepos.C_output6(Fst:Lst),DRepos.C_output7(Fst:Lst)]; 
+Fst=1;Lnth=size(DRepos.D_input,1)-1;Lst=Fst+Lnth;SclFtr=0.01;
+IO2=[DRepos.D_input(Fst:Lst),DRepos.D_output1(Fst:Lst),DRepos.D_output2(Fst:Lst),DRepos.D_output3(Fst:Lst),DRepos.D_output4(Fst:Lst),DRepos.D_output5(Fst:Lst),DRepos.D_output6(Fst:Lst),DRepos.D_output7(Fst:Lst)];
+Fst=1;Lnth=size(DRepos.E_input,1)-1;Lst=Fst+Lnth;SclFtr=0.01;
+IO3=[DRepos.E_input(Fst:Lst),DRepos.E_output1(Fst:Lst),DRepos.E_output2(Fst:Lst),DRepos.E_output3(Fst:Lst),DRepos.E_output4(Fst:Lst),DRepos.E_output5(Fst:Lst),DRepos.E_output6(Fst:Lst),DRepos.E_output7(Fst:Lst)];
+
+WState=IOA;State=SName(IOA);
+ChnlNo=1;
 IO=WState*SclFtr;
-% Fst=1;Lnth=size(DRepos.A_input,1)-1;Lst=Fst+Lnth;SclFtr=0.01;
-% IOA=[DRepos.A_input(Fst:Lst),DRepos.A_output1(Fst:Lst),DRepos.A_output2(Fst:Lst),DRepos.A_output3(Fst:Lst),DRepos.A_output4(Fst:Lst),DRepos.A_output5(Fst:Lst),DRepos.A_output6(Fst:Lst),DRepos.A_output7(Fst:Lst)];
-% 
-% Fst=1;Lnth=size(DRepos.B_input,1)-1;Lst=Fst+Lnth;SclFtr=0.01;
-% IOB=[DRepos.B_input(Fst:Lst),DRepos.B_output1(Fst:Lst),DRepos.B_output2(Fst:Lst),DRepos.B_output3(Fst:Lst),DRepos.B_output4(Fst:Lst),DRepos.B_output5(Fst:Lst),DRepos.B_output6(Fst:Lst),DRepos.B_output7(Fst:Lst)];
-% 
-% Fst=1;Lnth=size(DRepos.C_input,1)-1;Lst=Fst+Lnth;SclFtr=0.01;
-% IO1=[DRepos.C_input(Fst:Lst),DRepos.C_output1(Fst:Lst),DRepos.C_output2(Fst:Lst),DRepos.C_output3(Fst:Lst),DRepos.C_output4(Fst:Lst),DRepos.C_output5(Fst:Lst),DRepos.C_output6(Fst:Lst),DRepos.C_output7(Fst:Lst)];
-% 
-% Fst=1;Lnth=size(DRepos.D_input,1)-1;Lst=Fst+Lnth;SclFtr=0.01;
-% IO2=[DRepos.D_input(Fst:Lst),DRepos.D_output1(Fst:Lst),DRepos.D_output2(Fst:Lst),DRepos.D_output3(Fst:Lst),DRepos.D_output4(Fst:Lst),DRepos.D_output5(Fst:Lst),DRepos.D_output6(Fst:Lst),DRepos.D_output7(Fst:Lst)];
-% 
-% Fst=1;Lnth=size(DRepos.E_input,1)-1;Lst=Fst+Lnth;SclFtr=0.01;
-% IO3=[DRepos.E_input(Fst:Lst),DRepos.E_output1(Fst:Lst),DRepos.E_output2(Fst:Lst),DRepos.E_output3(Fst:Lst),DRepos.E_output4(Fst:Lst),DRepos.E_output5(Fst:Lst),DRepos.E_output6(Fst:Lst),DRepos.E_output7(Fst:Lst)];
-
-
 % Specify ambient test parameters
 SplFreqcy=200;
 DeltaT=1/SplFreqcy;
@@ -98,7 +93,7 @@ for i=1:size(IO,2)
 %    end
 %    V_th(:,i)=ifft(iV_th,'symmetric');
 %%%%%%%%%%直接积分法
-  V_th(:,i)=cumtrapz(t,IO(:,i));
+  V_th(:,i)=cumtrapz(IO(:,i))*(1/SplFreqcy);
 end
 
 for j=1:size(V_th,2)
@@ -136,7 +131,7 @@ StateFcn=@(X,U)(A*X+B*U);
 MeasurementFcn=@(Y) D*Y;
 obj = extendedKalmanFilter(StateFcn,MeasurementFcn,zeros(size(A,2),1),'StateCovariance',2*(mean(std(IO)')/size(IO,2))^2);
 obj.MeasurementNoise=(mean(std(IO)')/size(IO,2))^2;
-obj.ProcessNoise=0.001*(mean(std(IO)')/size(IO,2))^2;
+obj.ProcessNoise=0.1*(mean(std(IO)')/size(IO,2))^2;
 
 h=waitbar(0,'Working');
 tic;
@@ -144,7 +139,7 @@ for k = 1:size(NS,1)
   [CorrectedState,CorrectedStateCovariance] = correct(obj,NS(k,:)'); 
   [PredictedState,PredictedStateCovariance] = predict(obj,IO(k,1)*ones(size(B,2),1));
   FS(k,1:14)=(D*CorrectedState)';
-  time=toc;hrs=floor(time/3600);mnts=floor(time/60);secs=mod(time,60);
+  time=toc;hrs=floor(time/3600);mnts=floor((time-hrs*3600)/60);secs=mod(time,60);
   waitbar(k/size(NS,1),h,num2str(k*100/size(NS,1),'%.1f')+"%Completed"+"    "+"Time used: "+num2str(hrs,'%02.0f')+":"+num2str(mnts,'%02.0f')+":"+num2str(secs,'%.1f'));
 end
 h.delete;
@@ -162,7 +157,7 @@ subplot(2,3,1);
 plot(t,IO(:,ChnlNo+1));
 legend('\fontname{宋体}预处理后原纪录\fontname{Times new Roman}(IO)','Location','best');
 xlabel(['\fontname{宋体}通道',(num2str(ChnlNo)),'\fontname{宋体}时间\fontname{Times new Roman}(s)'],'FontSize',10);
-ylabel('\fontname{宋体}加速度\fontname{Times new Roman}(m^2/s)','FontSize',10);
+ylabel('\fontname{宋体}加速度\fontname{Times new Roman}(m/s^2)','FontSize',10);
 
 subplot(2,3,2);
 plot(t,NS(:,ChnlNo+7)); hold on;

@@ -67,7 +67,7 @@ for k=1:NumSeg
      B(:,k)=B(:,k)-polyval(polyfit(th,B(:,k),DtrOdr),th);%去一般趋势项
 end
 Acc_th=mean(B,2);
-
+  
 %% show the In_ch
 % figure(1);
 % th=[0:1/SamFreq:(SigLen-1)/SamFreq];
