@@ -68,14 +68,11 @@ clear all;clc;close all;
 % end
 % Acc_th=mean(B,2);
 % load('C:\Users\Bin Peng\Desktop\MAT20200420-1254（非安静）\MAT20200420-1254原始数据\202004201254.mat');
-  load('C:\Users\Bin Peng\Desktop\1号测点\1号测点_2020_04_20_145953.mat');
- for i=1:24
- %   SigLen=size(Datas,1);
-%   Acc_th=Datas(SigLen+1:2*SigLen,i);
-%   Acc_th=detrend(Acc_th);
-   SamFreq=500;
-%   th=[1/SamFreq:1/SamFreq:SigLen*(1/SamFreq)]';
-   OutPutResponsePSD=['C:\Users\Bin Peng\Desktop\',num2str(i)];
+load('C:\Users\Bin Peng\Desktop\1-4号场地选取数据\1号场地白天（8个测点）.mat');
+SamFreq=500;
+mkr=['o','o','o','+','+','+','*','*','*','x','x','x','s','s','s','d','d','d','^','^','^','v','v','v'];
+for i=1:3:22
+OutPutResponsePSD=['C:\Users\Bin Peng\Desktop\',num2str(i)];
 %% show the In_ch
 % figure(1);
 % th=[0:1/SamFreq:(SigLen-1)/SamFreq];
@@ -86,7 +83,6 @@ clear all;clc;close all;
 % ylabel('Acceleration (cm/s^2)');
 % ylim([1.1*min(In_th),1.1*max(In_th)]);
 % print('-f1',OutPutSourceAccTh,'-painters','-dmeta','-r600');
-
 %% show the Acc_ch
 % figure(2);
 % plot(th,Acc_th)
@@ -96,54 +92,30 @@ clear all;clc;close all;
 % ylabel('Acceleration (cm/s^2)');
 % ylim([1.1*min(Acc_th),1.1*max(Acc_th)]);
 % print('-f2',OutPutResponseAccTh,'-painters','-dmeta','-r600');
-
 %% PSD maker of Acc_th
 % figure(3);
-% % Acc_f=fft(Acc_th,SigLen);
-% % Psd=Acc_f.*conj(Acc_f)/SigLen;
-% % f=SamFreq/SigLen*(1:(0.5*SigLen))';
-% % plot(f,Psd(1:(0.5*SigLen)));
-% % [Psd,f]=periodogram(Acc_th,[],[],SamFreq);
-% % plot(f,Psd);
+% Acc_f=fft(Acc_th,SigLen);
+% Psd=Acc_f.*conj(Acc_f)/SigLen;
+% f=SamFreq/SigLen*(1:(0.5*SigLen))';
+% plot(f,Psd(1:(0.5*SigLen)));
+% [Psd,f]=periodogram(Acc_th,[],[],SamFreq);
+% plot(f,Psd);
 % [Psd,f]=pwelch(Acc_th,[],[],[],SamFreq);%默认窗、分段数和重叠长度
 % plot(f,Psd);
 % title('Power spectral density');
 % xlabel('Frequency (Hz)');
-% xlim([1,30]);
-% % ylim([0,0.05]);
+% xlim([0,100]);
+% ylim([0,0.05]);
 % %(《结构动力学》p.297上的单位为|Acc|^{2}/2Hz,与此处不同）The units of the PSD estimate are in squared magnitude units of the time series data per unit frequency.
 % %For example, if the input data is in volts, the PSD estimate is in units of squared volts per unit frequency. 
 % %For a time series in volts, if you assume a resistance of 1 Ω and specify the sample rate in hertz, the PSD estimate is in watts per hertz.
 % ylabel('|Acc|^{2}/Hz');
-% % ylim([0,1.1*max(Psd)]);
-% % [~,S] = max(Psd);
-% % Smax=S*(SamFreq/SigLen);
-% % sSmax=num2str(Smax,2);
-% % text(1,0.9*max(Psd),['\rightarrow',sSmax]);
-% print('-f3',OutPutResponsePSD,'-painters','-djpeg','-r600');
- 
- 
-% %% Velocity time history maker of Acc_th
-% figure(4);
-% % th=[0:1/SamFreq:(SigLen-1)/SamFreq];
-% % th=th';
-% V_th=cumtrapz(th,Acc_th)*(1/SamFreq);
-% % V_th(1)=0;
-% % for i=2:SigLen
-% %     V_th(i)=V_th(i-1)+(Acc_th(i)+Acc_th(i-1))*(1/SamFreq)*0.5;
-% % end
-% [pksv,ls]=max(abs(V_th));
-% plot(th,V_th);
-% title('Velocity');
-% xlabel('Time (s)');
-% xlim([0,SigLen/SamFreq]);
-% ylabel('Velocity (cm/s)');
-% ylim([1.1*min(V_th),1.1*max(V_th)]);
-% Vmax=max(abs(V_th));
-% sVmax=num2str(Vmax,2);
-% text(ls*(1/SamFreq),max(abs(V_th))*sign(V_th(ls)),['\rightarrow',sVmax]);
-% print('-f4',OutPutResponseVelTh,'-painters','-djpeg','-r600');
-
+% ylim([0,1.1*max(Psd)]);
+% [~,S] = max(Psd);
+% Smax=S*(SamFreq/SigLen);
+% sSmax=num2str(Smax,2);
+% text(1,0.9*max(Psd),['\rightarrow',sSmax]);
+% print('-f3',OutPutResponsePSD,'-painters','-dmeta','-r600');
 %% Displacement time history maker of Acc_th
 % figure(5);
 % th=[0:1/SamFreq:(SigLen-1)/SamFreq];
@@ -159,12 +131,10 @@ clear all;clc;close all;
 % xlim([0,SigLen/SamFreq]);
 % ylabel('Displacement (cm)');
 % ylim([1.1*min(D_th),1.1*max(D_th)]);
-
-%% divide the In_ch to n sections and make the averaged PSD
+%% divide the In_ch to n sections and show the time-history
 % figure(1);
 dD=reshape(Datas(:,i),300000,[]);
-% DD_th=cumtrapz(th,Datas(:,i))*(1/SamFreq);
-% 
+
 for k=1:size(dD,2)
 dD(:,k)=dD(:,k)-mean(dD(:,k));
 dD(:,k)=detrend(dD(:,k));
@@ -172,32 +142,111 @@ end
 
 SigLen=size(dD,1);
 th=[0:1/SamFreq:(SigLen-1)/SamFreq];
-% th=th';
-% D_th=cumtrapz(th,Datas(:,i))*(1/SamFreq);
-% DD_th=reshape(D_th,300000,[]);
 
 for j=1:(size(dD,2)-1)
 DD_th(:,j)=cumtrapz(th,dD(:,j))*(1/SamFreq);
-%[Psd(:,j),f]=pwelch(DD_th(:,j),[],[],[],SamFreq);%默认窗、分段数和重叠长度
-%[Psd(:,j),f]=pwelch(dD(:,j),[],[],[],SamFreq);%默认窗、分段数和重叠长度
 end
 
-% MPsd=mean(Psd,2);
 plot(th,DD_th(:,j));
-title('Averaged power spectral density');
+hold on;
+end
+title('Displacement');
 xlabel('time (s)');
 xlim([0,600]);
-ylabel('Dis');
-
-% th=[0:1/SamFreq:(SigLen-1)/SamFreq];
-% plot(th,In_th);
-% title('Input accelartion');
-% xlabel('Time (s)');
-% xlim([0,SigLen/SamFreq]);
-% ylabel('Acceleration (cm/s^2)');
-% ylim([1.1*min(In_th),1.1*max(In_th)]);
+ylabel('Dis(mm)');
+legend('1','2','3','4','5','6','7','8','location','northeastoutside')
 print('-f1', OutPutResponsePSD,'-painters','-djpeg','-r600');
-end
+%% divide the In_ch to n sections and make the root-mean-square (RMS) level
+% figure(1);
+% dD=reshape(Datas(:,i),30000,[]);
+% 
+% for k=1:size(dD,2)
+% dD(:,k)=dD(:,k)-mean(dD(:,k));
+% dD(:,k)=detrend(dD(:,k));
+% end
+% 
+% SigLen=size(dD,2);
+% th=[0:1:(SigLen-2)];
+% 
+% for j=1:(size(dD,2)-1)
+% % DD_th(:,j)=cumtrapz(th,dD(:,j))*(1/SamFreq);
+% DD_th(j)=rms(dD(:,j));
+% end
+% 
+% % MPsd=mean(Psd,2);
+% scatter(th,DD_th);
+% hold on;
+% end
+% title('root-mean-square (RMS) ');
+% xlabel('time(min)');
+% xlim([0,120]);
+% ylabel('RMS(mm)');
+% legend('1','2','3','4','5','6','7','8','location','northeastoutside')
+% print('-f1', OutPutResponsePSD,'-painters','-djpeg','-r600');
+%% divide the In_ch to n sections and make the averaged PSD and the RMS of PSD
+% figure(1);
+% dD=reshape(Datas(:,i),300000,[]);
+% 
+% for k=1:size(dD,2)
+% dD(:,k)=dD(:,k)-mean(dD(:,k));
+% dD(:,k)=detrend(dD(:,k));
+% end
+% 
+% SigLen=size(dD,1);
+% th=[0:1/SamFreq:(SigLen-1)/SamFreq];
+% 
+% for j=1:(size(dD,2))
+% DD_th(:,j)=cumtrapz(th,dD(:,j))*(1/SamFreq);
+% [Psd(:,j),f]=pwelch(DD_th(:,j),[],[],[],SamFreq);
+% end
+% 
+% MP=mean(Psd,2);
+% plot(f,MP);
+% hold on;
+% end 
+% title('RMS of the power spectral density');
+% xlim([1,200]);
+% % ylim([0,1.1*max(Psd)]);
+% xlabel('Frequency (Hz)');
+% ylabel('|Dis|^{2}/Hz');
+% %(《结构动力学》p.297上的单位为|Acc|^{2}/2Hz,与此处不同）The units of the PSD estimate are in squared magnitude units of the time series data per unit frequency.
+% %For example, if the input data is in volts, the PSD estimate is in units of squared volts per unit frequency. 
+% %For a time series in volts, if you assume a resistance of 1 Ω and specify the sample rate in hertz, the PSD estimate is in watts per hertz.
+% % [~,S] = max(MP);
+% % Smax=S*(SamFreq/SigLen);
+% % sSmax=num2str(Smax,2);
+% % text(1,0.9*max(MP),['\rightarrow',sSmax]);
+% legend('1','2','3','4','5','6','7','8','location','northeastoutside')
+% print('-f1', OutPutResponsePSD,'-painters','-djpeg','-r600');
+%% divide the In_ch to n sections and list the normalized peak to peak
+% figure(1);
+% dD=reshape(Datas(:,i),30000,[]);
+% 
+% for k=1:size(dD,2)
+% dD(:,k)=dD(:,k)-mean(dD(:,k));
+% dD(:,k)=detrend(dD(:,k));
+% end
+% 
+% SigLen=size(dD,1);
+% th=[0:1:(SigLen-1)];
+% 
+% for j=1:size(dD,2)
+% DD_th(:,j)=cumtrapz(th,dD(:,j))*(1/SamFreq);
+% Peak(j)=abs(max(DD_th(:,j))-min(DD_th(:,j)));
+% end
+% 
+% [Y,PS] = mapminmax(Peak,0.,1.);
+% % MPsd=mean(Psd,2);
+% scatter([0:1:120-1],Y,mkr(i));
+% hold on;
+% title('Normalized displacement peak to peak');
+% xlabel('time(min)');
+% xlim([0,120]);
+% ylabel('level');
+% ylim([0,1]);
+% end
+% legend('1','2','3','4','5','6','7','8','location','northeastoutside')
+% print('-f1', OutPutResponsePSD,'-painters','-djpeg','-r600');
 %% Cross correlation  
 % figure(6);
 % [acor,lag] = xcorr(In_th,Acc_th);
@@ -211,7 +260,6 @@ end
 % xlabel('Time lag (s)');
 % ylim([1.1*min(acor),1.1*max(acor)]);
 % ylabel('|Acc|^2');
-
 %% Cross coherent  
 % figure(7);
 % fs=[0:1/SamFreq:SamFreq/2];
