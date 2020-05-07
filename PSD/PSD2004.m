@@ -72,9 +72,9 @@ load('C:\Users\Bin Peng\Desktop\1-4号场地选取数据\1号场地晚上（8个测点）.mat');
 SamFreq=500;
 mkr=['o','o','o','+','+','+','*','*','*','x','x','x','s','s','s','d','d','d','^','^','^','v','v','v'];
 % for i=1:3:22
-for i=2:3:22
+for i=3:3:24
 % OutPutResponsePSD=['C:\Users\Bin Peng\Desktop\',num2str(i)];
-OutPutResponsePSD=['C:\Users\Bin Peng\Desktop\','方向2'];
+OutPutResponsePSD=['C:\Users\Bin Peng\Desktop\','方向3'];
 %% show the In_ch
 % figure(1);
 % th=[0:1/SamFreq:(SigLen-1)/SamFreq];
