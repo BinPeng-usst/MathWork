@@ -68,11 +68,13 @@ clear all;clc;close all;
 % end
 % Acc_th=mean(B,2);
 % load('C:\Users\Bin Peng\Desktop\MAT20200420-1254（非安静）\MAT20200420-1254原始数据\202004201254.mat');
-load('C:\Users\Bin Peng\Desktop\1-4号场地选取数据\1号场地白天（8个测点）.mat');
+load('C:\Users\Bin Peng\Desktop\1-4号场地选取数据\1号场地晚上（8个测点）.mat');
 SamFreq=500;
 mkr=['o','o','o','+','+','+','*','*','*','x','x','x','s','s','s','d','d','d','^','^','^','v','v','v'];
-for i=1:3:22
-OutPutResponsePSD=['C:\Users\Bin Peng\Desktop\',num2str(i)];
+% for i=1:3:22
+for i=2:3:22
+% OutPutResponsePSD=['C:\Users\Bin Peng\Desktop\',num2str(i)];
+OutPutResponsePSD=['C:\Users\Bin Peng\Desktop\','方向2'];
 %% show the In_ch
 % figure(1);
 % th=[0:1/SamFreq:(SigLen-1)/SamFreq];
@@ -131,122 +133,6 @@ OutPutResponsePSD=['C:\Users\Bin Peng\Desktop\',num2str(i)];
 % xlim([0,SigLen/SamFreq]);
 % ylabel('Displacement (cm)');
 % ylim([1.1*min(D_th),1.1*max(D_th)]);
-%% divide the In_ch to n sections and show the time-history
-% figure(1);
-dD=reshape(Datas(:,i),300000,[]);
-
-for k=1:size(dD,2)
-dD(:,k)=dD(:,k)-mean(dD(:,k));
-dD(:,k)=detrend(dD(:,k));
-end
-
-SigLen=size(dD,1);
-th=[0:1/SamFreq:(SigLen-1)/SamFreq];
-
-for j=1:(size(dD,2)-1)
-DD_th(:,j)=cumtrapz(th,dD(:,j))*(1/SamFreq);
-end
-
-plot(th,DD_th(:,j));
-hold on;
-end
-title('Displacement');
-xlabel('time (s)');
-xlim([0,600]);
-ylabel('Dis(mm)');
-legend('1','2','3','4','5','6','7','8','location','northeastoutside')
-print('-f1', OutPutResponsePSD,'-painters','-djpeg','-r600');
-%% divide the In_ch to n sections and make the root-mean-square (RMS) level
-% figure(1);
-% dD=reshape(Datas(:,i),30000,[]);
-% 
-% for k=1:size(dD,2)
-% dD(:,k)=dD(:,k)-mean(dD(:,k));
-% dD(:,k)=detrend(dD(:,k));
-% end
-% 
-% SigLen=size(dD,2);
-% th=[0:1:(SigLen-2)];
-% 
-% for j=1:(size(dD,2)-1)
-% % DD_th(:,j)=cumtrapz(th,dD(:,j))*(1/SamFreq);
-% DD_th(j)=rms(dD(:,j));
-% end
-% 
-% % MPsd=mean(Psd,2);
-% scatter(th,DD_th);
-% hold on;
-% end
-% title('root-mean-square (RMS) ');
-% xlabel('time(min)');
-% xlim([0,120]);
-% ylabel('RMS(mm)');
-% legend('1','2','3','4','5','6','7','8','location','northeastoutside')
-% print('-f1', OutPutResponsePSD,'-painters','-djpeg','-r600');
-%% divide the In_ch to n sections and make the averaged PSD and the RMS of PSD
-% figure(1);
-% dD=reshape(Datas(:,i),300000,[]);
-% 
-% for k=1:size(dD,2)
-% dD(:,k)=dD(:,k)-mean(dD(:,k));
-% dD(:,k)=detrend(dD(:,k));
-% end
-% 
-% SigLen=size(dD,1);
-% th=[0:1/SamFreq:(SigLen-1)/SamFreq];
-% 
-% for j=1:(size(dD,2))
-% DD_th(:,j)=cumtrapz(th,dD(:,j))*(1/SamFreq);
-% [Psd(:,j),f]=pwelch(DD_th(:,j),[],[],[],SamFreq);
-% end
-% 
-% MP=mean(Psd,2);
-% plot(f,MP);
-% hold on;
-% end 
-% title('RMS of the power spectral density');
-% xlim([1,200]);
-% % ylim([0,1.1*max(Psd)]);
-% xlabel('Frequency (Hz)');
-% ylabel('|Dis|^{2}/Hz');
-% %(《结构动力学》p.297上的单位为|Acc|^{2}/2Hz,与此处不同）The units of the PSD estimate are in squared magnitude units of the time series data per unit frequency.
-% %For example, if the input data is in volts, the PSD estimate is in units of squared volts per unit frequency. 
-% %For a time series in volts, if you assume a resistance of 1 Ω and specify the sample rate in hertz, the PSD estimate is in watts per hertz.
-% % [~,S] = max(MP);
-% % Smax=S*(SamFreq/SigLen);
-% % sSmax=num2str(Smax,2);
-% % text(1,0.9*max(MP),['\rightarrow',sSmax]);
-% legend('1','2','3','4','5','6','7','8','location','northeastoutside')
-% print('-f1', OutPutResponsePSD,'-painters','-djpeg','-r600');
-%% divide the In_ch to n sections and list the normalized peak to peak
-% figure(1);
-% dD=reshape(Datas(:,i),30000,[]);
-% 
-% for k=1:size(dD,2)
-% dD(:,k)=dD(:,k)-mean(dD(:,k));
-% dD(:,k)=detrend(dD(:,k));
-% end
-% 
-% SigLen=size(dD,1);
-% th=[0:1:(SigLen-1)];
-% 
-% for j=1:size(dD,2)
-% DD_th(:,j)=cumtrapz(th,dD(:,j))*(1/SamFreq);
-% Peak(j)=abs(max(DD_th(:,j))-min(DD_th(:,j)));
-% end
-% 
-% [Y,PS] = mapminmax(Peak,0.,1.);
-% % MPsd=mean(Psd,2);
-% scatter([0:1:120-1],Y,mkr(i));
-% hold on;
-% title('Normalized displacement peak to peak');
-% xlabel('time(min)');
-% xlim([0,120]);
-% ylabel('level');
-% ylim([0,1]);
-% end
-% legend('1','2','3','4','5','6','7','8','location','northeastoutside')
-% print('-f1', OutPutResponsePSD,'-painters','-djpeg','-r600');
 %% Cross correlation  
 % figure(6);
 % [acor,lag] = xcorr(In_th,Acc_th);
@@ -274,4 +160,125 @@ print('-f1', OutPutResponsePSD,'-painters','-djpeg','-r600');
 % xlabel('frequency (Hz)');
 % ylim([0,1]);
 % print('-f7',OutPutCoheret,'-painters','-dmeta','-r600');
+%% divide the In_ch to n sections and show the time-history
+figure(1);
+dD=reshape(Datas(:,i),300000,[]);
+bp=0:6000:300000;
+for k=1:size(dD,2)
+dD(:,k)=dD(:,k)-mean(dD(:,k));
+dD(:,k)=detrend(dD(:,k),'linear',bp);
+end
 
+SigLen=size(dD,1);
+th=[0:1/SamFreq:(SigLen-1)/SamFreq];
+
+for j=1:(size(dD,2)-1)
+DD_th(:,j)=cumtrapz(th,dD(:,j))*(1/SamFreq);
+end
+plot(th,DD_th(:,j));
+hold on;
+end
+title('Displacement');
+xlabel('time (s)');
+xlim([0,600]);
+ylabel('Dis(mm)');
+legend('1','2','3','4','5','6','7','8','location','northeastoutside')
+print('-f1', OutPutResponsePSD,'-painters','-djpeg','-r600');
+
+%% divide the In_ch to n sections and make the root-mean-square (RMS) level or mean PSD
+% figure(1);
+% dD=reshape(Datas(:,i),30000,[]);
+% bp=0:6000:30000;
+% for k=1:size(dD,2)
+% dD(:,k)=dD(:,k)-mean(dD(:,k));
+% dD(:,k)=detrend(dD(:,k),'linear',bp);
+% end
+% 
+% SigLen=size(dD,1);
+% th=0:1:(SigLen-1);
+% 
+% for j=1:(size(dD,2))
+% DD_th(:,j)=cumtrapz(th',dD(:,j))*(1/SamFreq);
+% [Psd(:,j),f]=pwelch(DD_th(:,j),[],[],[],SamFreq);%默认窗、分段数和重叠长度
+% % DD(j)=rms(DD_th(:,j));
+% end
+% 
+% MPsd=mean(Psd,2);
+% % scatter(0:1:119,DD,'marker',mkr(i));
+% semilogx(f,MPsd);
+% hold on;
+% end
+% title('PSD ');
+% xlabel('Frequence(Hz)');
+% xlim([1,200]);
+% % ylabel('RMS(mm)');
+% legend('1','2','3','4','5','6','7','8','location','northeastoutside')
+% print('-f1', OutPutResponsePSD,'-painters','-djpeg','-r600');
+%% divide the In_ch to n sections and make the histogram of the RMS of the displacement
+% figure(1);
+% dD=reshape(Datas(:,i),300000,[]);
+% bp=0:6000:300000;
+% for k=1:size(dD,2)
+% dD(:,k)=dD(:,k)-mean(dD(:,k));
+% dD(:,k)=detrend(dD(:,k),'linear',bp);
+% end
+% 
+% SigLen=size(dD,1);
+% th=[0:1/SamFreq:(SigLen-1)/SamFreq];
+% 
+% for j=1:(size(dD,2))
+% DD_th(:,j)=cumtrapz(th,dD(:,j))*(1/SamFreq);
+% R_S(j)=rms(DD_th(:,j));
+% end
+% [htct,edges] = histcounts(R_S,100,'Normalization','probability');
+% Bw=edges(2)-edges(1);
+% E=0.5*Bw:0.5*Bw:100*0.5*Bw;
+% plot(E,htct,'marker',mkr(i));
+% hold on;
+% end
+% title('histogram of the RMS of the displacement');
+% % xlim([0,E(end)]);
+% % ylim([0,1.1*max(Psd)]);
+% xlabel('Displacement (mm)');
+% % ylabel('|Dis|^{2}/Hz');
+% %(《结构动力学》p.297上的单位为|Acc|^{2}/2Hz,与此处不同）The units of the PSD estimate are in squared magnitude units of the time series data per unit frequency.
+% %For example, if the input data is in volts, the PSD estimate is in units of squared volts per unit frequency. 
+% %For a time series in volts, if you assume a resistance of 1 Ω and specify the sample rate in hertz, the PSD estimate is in watts per hertz.
+% % [~,S] = max(MP);
+% % Smax=S*(SamFreq/SigLen);
+% % sSmax=num2str(Smax,2);
+% % text(1,0.9*max(MP),['\rightarrow',sSmax]);
+% legend('1','2','3','4','5','6','7','8','location','northeastoutside')
+% print('-f1', OutPutResponsePSD,'-painters','-djpeg','-r600');
+% % end
+%% divide the In_ch to n sections and list the histogram of the peak-to-peak value
+% figure(1);
+% dD=reshape(Datas(:,i),300000,[]);
+% bp=0:6000:300000;
+% for k=1:size(dD,2)
+% dD(:,k)=dD(:,k)-mean(dD(:,k));
+% dD(:,k)=detrend(dD(:,k),'linear',bp);
+% end
+% 
+% SigLen=size(dD,1);
+% th=[0:1:(SigLen-1)];
+% 
+% for j=1:size(dD,2)
+% DD_th(:,j)=cumtrapz(th,dD(:,j))*(1/SamFreq);
+% Peak(j)=abs(max(DD_th(:,j))-min(DD_th(:,j)));
+% end
+% 
+% [htct,edges] = histcounts(Peak,100,'Normalization','probability');
+% Bw=edges(2)-edges(1);
+% E=0.5*Bw:0.5*Bw:100*0.5*Bw;
+% plot(E,htct,'marker',mkr(i));
+% hold on;
+% % ylabel('level');
+% % ylim([0,1]);
+% end
+% title('Histogram of the peak-to-peak value of the displacement');
+% xlabel('Peak-to-peak value of the displacement(mm)');
+% xlim([0,E(end)]);
+% legend('1','2','3','4','5','6','7','8','location','northeastoutside')
+% print('-f1', OutPutResponsePSD,'-painters','-djpeg','-r600');
+% % end
