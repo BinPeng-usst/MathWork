@@ -68,11 +68,11 @@ clear all;clc;close all;
 % end
 % Acc_th=mean(B,2);
 % load('C:\Users\Bin Peng\Desktop\MAT20200420-1254（非安静）\MAT20200420-1254原始数据\202004201254.mat');
-load('C:\Users\Bin Peng\Desktop\1-4号场地选取数据\1号场地晚上（8个测点）.mat');
+load('C:\Users\Bin Peng\Desktop\1-4号场地选取数据\1号场地白天（8个测点）.mat');
 SamFreq=500;
 mkr=['o','o','o','+','+','+','*','*','*','x','x','x','s','s','s','d','d','d','^','^','^','v','v','v'];
 % for i=1:3:22
-for i=3:3:24
+for i=3:3:23
 % OutPutResponsePSD=['C:\Users\Bin Peng\Desktop\',num2str(i)];
 OutPutResponsePSD=['C:\Users\Bin Peng\Desktop\','方向3'];
 %% show the In_ch
@@ -165,15 +165,14 @@ figure(1);
 dD=reshape(Datas(:,i),300000,[]);
 bp=0:6000:300000;
 for k=1:size(dD,2)
-dD(:,k)=dD(:,k)-mean(dD(:,k));
+% dD(:,k)=dD(:,k)-mean(dD(:,k));
 dD(:,k)=detrend(dD(:,k),'linear',bp);
 end
-
 SigLen=size(dD,1);
 th=[0:1/SamFreq:(SigLen-1)/SamFreq];
 
 for j=1:(size(dD,2)-1)
-DD_th(:,j)=cumtrapz(th,dD(:,j))*(1/SamFreq);
+DD_th(:,j)=cumtrapz(th,dD(:,j));
 end
 plot(th,DD_th(:,j));
 hold on;
